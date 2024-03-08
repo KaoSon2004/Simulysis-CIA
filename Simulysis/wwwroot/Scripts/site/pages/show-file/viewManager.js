@@ -12,9 +12,7 @@ import SystemLevelUtil from '../../utils/systemLevel.js'
 import PopUpUtils from '../../utils/popUp.js'
 import { noop } from '../../noop.js'
 
-import TraceSignalTree from '../../draw/traceSignalTree/index.js'
-import Utils from "../trackline/utils.js"
-import Algorithm from '../trackline/algorithm.js'
+
 
 var ViewManager = {
 	/*
@@ -52,9 +50,7 @@ var ViewManager = {
 	numClick: 0,
 
 	levelClickContents: {},
-	traceSignalTree: {},
-	utils: {},
-	algorithm: {},
+
 
 
 	/*
@@ -112,18 +108,7 @@ var ViewManager = {
 		this.numClick = 0;
 		$("#numClick").val(this.numClick);
 		this.levelClickContents = {};
-		this.traceSignalTree = Object.create(TraceSignalTree);
 
-		this.traceSignalTree.init(this.modelDraw.drawEntities, this);
-
-		this.utils = Object.create(Utils);
-		this.utils.init(this.modelDraw, this.traceSignalTree);
-
-		this.algorithm = Object.create(Algorithm);
-		this.algorithm.init(
-			this.utils, this.modelDraw
-			, this.traceSignalTree, this.levelClickContents
-		);
 	},
 	initOptions({ hasNetworkView = true, modelViewPopUp = true, goUpDownCallback = noop, }) {
 		this.initialLevel = SystemLevelUtil.mapNameToLevel($('#systemLevelText').text())
@@ -279,14 +264,7 @@ var ViewManager = {
 			$('#upLevelBtn').off('click')
 		}
 		this.modelDraw && this.modelDraw.destroy()
-		var popUpProps = {
-			w: screen.width,
-			h: screen.height,
-			url: `${window.location.href
-				.replace(new RegExp(`\\b${this.originalFileId}\\b`), this.currentFileId)
-				.replace(new RegExp('\\bShow\\b'), 'Trackline')}?rootSysId=${rootSysId}
-					`
-		}
+
 
 		this.modelDraw = Object.create(ModelDraw).init(
 			{
@@ -300,7 +278,6 @@ var ViewManager = {
 			{
 				additionalDrawListeners: [this.addGoUpLevel.bind(this)],
 				allowPopUp: this.modelViewPopUp,
-				popUpProps: popUpProps,
 			},
 			this
 		)
@@ -374,19 +351,9 @@ var ViewManager = {
 		$('#switchViewBtn').click(this.swapView.bind(this))
 		$('#viewNetworkBtn').click(this.toggleNetwork.bind(this))
 		$('#viewType').change(this.changeNetworkViewType.bind(this))
-		$('#popUpTrackline').click(this.popUpTrackline.bind(this))
 		$('#toggleTreeBtn').click(this.toggleSideView.bind(this))
 	},
-	popUpTrackline() {
-		PopUpUtils.popupCenter({
-			w: 1000,
-			h: 800,
-			url: `${window.location.href
-				.replace(new RegExp(`\\b${this.originalFileId}\\b`), this.currentFileId)
-				.replace(new RegExp('\\bShow\\b'), 'Trackline')}?rootSysId=${this.rootSysId}
-			`
-		})
-	},
+
 	swapView(changeSwapProp = true) {
 		var { modelDraw, sideDraw } = this.detachDraws()
 
@@ -803,7 +770,6 @@ var ViewManager = {
 			}
 
 			this.goUpDownCallback()
-			this.traceSignalTree.reDrawTree(clickSys?.name);
 			// stop loading
 			this.stopLoadingViews()
 
@@ -813,11 +779,6 @@ var ViewManager = {
 
 
 
-	updateModelDraw() {
-		this.traceSignalTree.modelDraw = this.modelDraw.drawEntities;
-		this.utils.modelDraw = this.modelDraw;
-		this.algorithm.modelDraw = this.modelDraw;
-	},
 
 
 }

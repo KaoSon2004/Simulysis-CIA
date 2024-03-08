@@ -1,0 +1,12 @@
+﻿.custom-form {
+    width: 85%;
+    max-width: 860px;
+    margin: 3rem auto;
+
+    &-required::after {
+        content: "*";
+        font-weight: bold;
+        color: red;
+        margin-left: 0.25rem;
+    }
+}

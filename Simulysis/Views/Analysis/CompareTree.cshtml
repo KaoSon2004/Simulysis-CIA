@@ -1,0 +1,236 @@
+﻿@{
+    ViewBag.Title = "Analysis";
+    ViewBag.Controller = "Analysis";
+    ViewBag.ActiveTab = "All Projects";
+    ViewBag.ItemName = "projects";
+}
+<script src="~/Scripts/d3/d3.min.js"></script>
+<script>
+    var deletedSystemFiles = [];
+    var addedSystemFiles = [];
+    var addedLineFiles = [];
+    var deletedLineFiles = [];
+    var addedFiles = [];
+    var treeImpactSet = [];
+    @{
+        for (int i = 0; i < ViewBag.deletedLineFilesDTO.Count; i++)
+        {
+            <text>deletedLineFiles[@i] = '@Html.Raw(ViewBag.deletedLineFilesDTO[@i].FK_ProjectFileId)'; </text>
+        }
+        for (int i = 0; i < ViewBag.addedLineFilesDTO.Count; i++)
+        {
+            <text>addedLineFiles[@i] = '@Html.Raw(ViewBag.addedLineFilesDTO[@i].FK_ProjectFileId)'; </text>
+        }
+        for (int i = 0; i < ViewBag.addedSystemFilesDTO.Count; i++)
+        {
+            <text>addedSystemFiles[@i] = '@Html.Raw(ViewBag.addedSystemFilesDTO[@i].FK_ProjectFileId)'; </text>
+
+        }
+        for (int i = 0; i < ViewBag.deletedSystemFilesDTO.Count; i++)
+        {
+            <text>deletedSystemFiles[@i] = '@Html.Raw(ViewBag.deletedSystemFilesDTO[@i].FK_NewVersionProjectFileID)'; </text>
+        }
+        for (int i = 0; i < ViewBag.addedFilesDTO.Count; i++)
+        {
+            <text>addedFiles[@i] = '@Html.Raw(ViewBag.addedFilesDTO[@i])'; </text>
+        }
+        for (int i = 0; i < ViewBag.treeImpactSet.Count; i++)
+        {
+            <text>treeImpactSet[@i] = '@Html.Raw(ViewBag.treeImpactSet[@i])'; </text>
+        }
+    }
+
+
+</script>
+<div id="analyse-page"></div>
+@Html.Partial("~/Views/Shared/_Analysis.cshtml")
+
+
+<script>
+                                    var impactSetColor = "#B24BF3"
+
+    function removeDuplicates(arr) {
+        let unique = [];
+        arr.forEach(element => {
+            if (!unique.includes(element)) {
+                unique.push(element);
+            }
+        });
+        return unique;
+    }
+
+    deletedSystemFiles = removeDuplicates(deletedSystemFiles)
+    addedSystemFiles = removeDuplicates(addedSystemFiles)
+    addedLineFiles = removeDuplicates(addedLineFiles)
+    deletedLineFiles = removeDuplicates(deletedLineFiles)
+    addedFiles = removeDuplicates(addedFiles)
+
+    console.log('deletedSystemFiles:' + deletedSystemFiles)
+    console.log('addedSystemFiles:' + addedSystemFiles)
+    console.log('addedLineFiles:' + addedLineFiles)
+    console.log('deletedLineFiles:' + deletedLineFiles)
+    console.log('addedFiles:' + addedFiles)
+    var time = setTimeout(ChangeBackground, 4000)
+
+    ChangeBackground()
+    function ChangeBackground() {
+        var green = '008000';
+        var red = 'ff0000';
+        var orange = 'FFA500'
+
+
+        // Load patterns
+
+        for (let i = 0; i < deletedSystemFiles.length; i++) {
+            $("svg").each(function () {
+                $(this).find("#" + deletedSystemFiles[i]).css({ fill: '#' + orange });
+
+            });
+        }
+
+        for (let i = 0; i < addedSystemFiles.length; i++) {
+            $("svg").each(function () {
+                $(this).find("#" + addedSystemFiles[i]).css({ fill: '#' + orange });
+
+            });
+        }
+
+        for (let i = 0; i < addedLineFiles.length; i++) {
+            $("svg").each(function () {
+                $(this).find("#" + addedLineFiles[i]).css({ fill: '#' + orange });
+
+            });
+        }
+        for (let i = 0; i < deletedLineFiles.length; i++) {
+            $("svg").each(function () {
+                $(this).find("#" + deletedLineFiles[i]).css({ fill: '#' + orange });
+
+            });
+        }
+        for (let i = 0; i < addedFiles.length; i++) {
+            let intervalBg = setInterval(function () {
+                if ($("rect#" + addedFiles[i]).length != 0) {
+                    clearInterval(intervalBg)
+                    $("rect#" + addedFiles[i]).css({ fill: '#' + orange });
+                }
+            }, 5)
+
+
+        }
+
+
+    }
+
+    var isImpactSetHighlighted = false;
+
+    // Highlight nodes belonging to the impact set
+    //document.getElementById("impact-analyse-btn").onclick = function () {
+
+    //};
+
+    function treeImpactAnalyse() {
+        $('#impact-analyse-btn').toggleClass("active");
+        if ($('#impact-analyse-btn').text() === "Show Impact") {$('#impact-analyse-btn').text("Hide Impact");}
+        else {
+            $('#impact-analyse-btn').text("Show Impact")
+        }
+        console.log("Analysed")
+        for (let i = 0; i < treeImpactSet.length; i++) {
+            var escapedId = CSS.escape(treeImpactSet[i]);
+            var blocks = document.querySelectorAll(`#${escapedId}`);
+
+            for (const block of blocks) {
+                if (!isImpactSetHighlighted) {
+                    block.style.fill = impactSetColor;
+                    block.parentElement.querySelector("text").style.fill = "white";
+                } else {
+                    block.style.fill = "white";
+                    ChangeBackground();
+                    block.parentElement.querySelector("text").style.fill = "black";
+                }
+            }
+
+        }
+
+        isImpactSetHighlighted = !isImpactSetHighlighted;
+    }
+
+    function changeBackground(id, data) {
+        
+            if ($("#" + id + "_anchor").length != 0)
+            $("#" + id + "_anchor").css("background-color", "orange")
+      
+    }
+    function getAllRelaNode(data, ListFile) {
+        var list = new Set()
+        for (const value of ListFile) {
+            let curNode = "folder" + value
+            let parNode = data.instance.get_parent(curNode)
+            list.add(curNode)
+            console.log(list)
+            console.log(parNode + "la bo" + curNode)
+            console.log(parNode)
+            
+            while (parNode != "folder0" ) {
+                console.log("1")
+                list.add(parNode)
+                console.log(list)
+                parNode = data.instance.get_parent(parNode) 
+                console.log(parNode)
+            }
+        }//ListFile.forEach(function(value) {
+        //    var curNode = "folder" + value
+        //    var parNode = data.instance.get_parent(curNode)
+        //    list.add(curNode)
+        //    while (parNode != "folder0") {
+        //        console("1")
+        //        list.add(parNode)
+        //        parNode = data.instance.get_parent(parNode)
+        //    }
+        //})
+        console.log(list)
+        return list
+
+    };
+    $('#tree-folder')
+        // listen for event
+        .bind('open_node.jstree', function (e, data) {
+            console.log(1000)
+            console.log(e)
+            console.log(data)
+            var ListFile = new Set();
+
+            for (let i = 0; i < deletedSystemFiles.length; i++) {
+                if (data.instance.get_node(deletedSystemFiles[i]))
+                    ListFile.add(deletedSystemFiles[i])
+            }
+
+            for (let i = 0; i < addedSystemFiles.length; i++) {
+                if (data.instance.get_node("folder" + addedSystemFiles[i]))
+                    ListFile.add(addedSystemFiles[i])
+            }
+            for (let i = 0; i < addedLineFiles.length; i++) {
+                if (data.instance.get_node("folder" + addedLineFiles[i]))
+                    ListFile.add(addedLineFiles[i])
+            }
+            for (let i = 0; i < deletedLineFiles.length; i++) {
+                if (data.instance.get_node("folder" + deletedLineFiles[i]))
+                    ListFile.add(deletedLineFiles[i])
+            }
+            for (let i = 0; i < addedFiles.length; i++) {
+                if (data.instance.get_node("folder" + addedFiles[i]))
+                    ListFile.add(addedFiles[i])
+            }
+            console.log(ListFile)
+            
+                var folderChanged = getAllRelaNode(data, ListFile)
+            folderChanged.forEach (function(value) {
+                changeBackground(value,data)
+            })
+        })
+
+
+</script>
+
+
+

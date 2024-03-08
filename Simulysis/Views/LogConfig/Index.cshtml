@@ -1,0 +1,84 @@
+﻿@model Simulysis.Models.LogConfigView
+@{
+    ViewBag.Title = "Log Setting";
+    ViewBag.ActiveTab = "Logging";
+}
+<head>
+    <style>
+        .container {
+            margin-top: 5rem;
+        }
+
+        label {
+            margin: auto;
+            width: 50%;
+            padding: 10px;
+            text-align: right;
+            flex: 1;
+        }
+
+        .buttons {
+            display: flex;
+            margin-top: 3rem;
+            justify-content: space-between;
+        }
+
+        .log_label {
+            display: flex;
+            text-align: center;
+        }
+
+        #bt1 {
+            width: 100%;
+        }
+
+        select {
+            text-align: center;
+            text-align-last: center;
+            -moz-text-align-last: center;
+        }
+    </style>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/js/all.min.js"></script>
+</head>
+
+<body>
+    <div class="toolbar">
+        <button class="toolbar-btn">
+            @Html.Partial("Svg/_JumpBackIcon")
+            @Html.ActionLink("Back", "Index", "Projects")
+        </button>
+        <button class="toolbar-btn">
+            @Html.Partial("Svg/_DownloadIcon")
+            @Html.ActionLink("Download ", "Download", "LogConfig")
+        </button>
+
+        <button class="toolbar-btn">
+            @Html.Partial("Svg/_EyeFilledIcon")
+            @Html.ActionLink("View ", "ViewLogFile", "LogConfig")
+        </button>
+    </div>
+  
+    @using (Html.BeginForm("Index", "LogConfig", FormMethod.Post, new { @class = "custom-form " }))
+    {
+        <div class="container ">
+
+            @Html.AntiForgeryToken()
+            <div class="row">
+                <div class="col-4 log_label">
+                    @Html.LabelFor(m => m.SelectedLogLevel, "Log Level :", new { @class = "" })
+                </div>
+
+                <div class="col-3 mr-3">
+                    @Html.DropDownListFor(m => m.SelectedLogLevel, Model.LogLevels, new { @class = "form-control" })
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-outline-danger" id="bt1">Update</button>
+                </div>
+            </div>
+
+            @Html.ValidationMessageFor(m => m.SelectedLogLevel)
+        </div>
+    }
+
+</body>

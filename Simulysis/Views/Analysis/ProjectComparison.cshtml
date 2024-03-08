@@ -1,0 +1,43 @@
+﻿@model IEnumerable<Simulysis.Models.ExistingProjectInfo>
+
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Simulysis</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Site/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Simulysis.styles.css" asp-append-version="true" />
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Inter' />
+</head>
+
+<div id="projectComparision">
+    <div class="analysisFormTitle">Project Analysis</div>
+    <div class="compareInfoPart">
+        <div><label class="col-12 col-lg-4 title">Project</label></div>
+        <select name="projectSelector" id="projectSelector">
+            @foreach (var projectInfo in Model)
+            {
+                <option value="@projectInfo.ProjectId">@projectInfo.Name</option>
+            }
+        </select>
+    </div>
+    <div id="versionPicker"></div>
+</div>
+
+
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script>
+    async function updateVersionPicker(element) {
+        //var versionResult = await $.get(`/Analysis/ProjectComparisonGetVersions/${element.val()}`);
+        var versionResult = await $.get('@Url.Content("~/Analysis/ProjectComparisonGetVersions/")' + element.val());
+        $("#versionPicker").html(versionResult);
+    }
+
+    updateVersionPicker($("#projectSelector"))
+
+    $("#projectSelector").change(async function () {
+        await updateVersionPicker($(this))
+    })
+</script>
+
+

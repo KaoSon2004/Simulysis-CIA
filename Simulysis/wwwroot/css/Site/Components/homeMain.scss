@@ -1,0 +1,31 @@
+.main {
+.homeMain {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    
+    ._main {
+        
+        width: 80%;
+
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        font-family: 'Roboto', sans-serif;
+        color: $color-primary;
+    }
+    p {
+        color: $text-color;
+    }
+}
+}
+
+@media all and (min-width: 900px) {
+    .main .homeMain ._main{
+        
+        max-width:800px;
+    }
+}

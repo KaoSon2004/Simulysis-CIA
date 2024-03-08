@@ -1,0 +1,24 @@
+html {
+    position: relative;
+    min-height: 100%;
+    font-family: 'Inter';
+    font-size: 14px;
+}
+
+body {
+    margin-bottom: 60px;
+}
+
+a {
+    text-decoration: none;
+    color: black;
+}
+.red {
+    color: red;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}

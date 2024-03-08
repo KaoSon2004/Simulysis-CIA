@@ -1,0 +1,30 @@
+﻿@{
+    ViewBag.UtilsForm = "projectSearch";
+    ViewBag.Title = "Projects List";
+    ViewBag.Controller = "Projects";
+    ViewBag.ActiveTab = "All Projects";
+    ViewBag.DeleteForm = "proj-del-form";
+    ViewBag.ItemName = "projects";
+}
+
+<div class="toolbar">
+    <a href="@Url.Action("New", "Projects")" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_PlusIcon.cshtml")
+        <span>
+            New
+        </span>
+    </a>
+
+    <button type="button" class="toolbar-btn" data-bs-toggle="modal" data-bs-target="#confirmDelete">
+        @Html.Partial("~/Views/Shared/Svg/_TrashIcon.cshtml")
+        <span>
+            Delete
+        </span>
+    </button>
+</div>
+
+@Html.Partial("~/Views/Shared/_Table.cshtml")
+
+<style>
+
+</style>

@@ -1,0 +1,72 @@
+﻿.tableForm {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    font-family: "Roboto",sans-serif;
+
+    .tableContainer {
+        width: 90%;
+        border-radius: 12px;
+        overflow: hidden;
+        margin-bottom: 25px;
+        box-shadow: rgba(64, 60, 67, 0.25) 0px 2px 5px 1px;
+
+        &:hover {
+            box-shadow: rgba(64, 60, 67, 0.24) 0px 2px 8px 1px;
+        }
+
+        .fileTable {
+            width: 100%;
+            border-collapse: collapse;
+
+            thead {
+                padding: 12px;
+                height: 40px;
+                background: $color-primary;
+                color: white;
+
+                th {
+                    font-weight: 500;
+                }
+            }
+
+            tr {
+                height: 40px;
+
+                &:hover {
+                    background: rgba(64, 60, 67, 0.24);
+                }
+            }
+
+            th, td {
+                word-break: break-word;
+                border-right: .1rem solid #DEE2E6;
+                border-bottom: .1rem solid #DEE2E6;
+                padding-left: 10px;
+
+                &.checkboxContainer {
+                    text-align: center;
+                    padding: 0;
+
+                    input[type="checkbox"] {
+                        cursor: pointer;
+                    }
+                }
+
+                &:last-child {
+                    border-right: 0;
+                }
+            }
+
+
+            input[type='checkbox'] {
+                padding: 12px;
+            }
+        }
+    }
+}
+
+#projectSearch {
+    width: 80%;
+}
+

@@ -1,0 +1,153 @@
+﻿@model Simulysis.Models.TableView
+@{
+    ViewBag.UtilsForm = "projectSearch";
+    ViewBag.Title = "Projects List";
+    ViewBag.Controller = "Projects";
+    ViewBag.ActiveTab = "All Projects";
+    ViewBag.DeleteForm = "proj-del-form";
+    ViewBag.ItemName = "projects";
+    ViewBag.Title = ViewBag.FileName;
+    ViewBag.CTitle = true;
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+}
+
+<div id="helperTooltip" class="helper-tooltip"></div>
+
+<b id="pageTitle" style="font-size:18pt; color:#1D5193">@ViewBag.Title</b>
+<div class="toolbar">
+    <a href="@Url.Action("Index", "Files", new { projectId = Convert.ToInt64(ViewBag.ProjectId) })" class="toolbar-btn">
+        @Html.Partial("Svg/_JumpBackIcon")
+        Back
+    </a>
+
+    @*<a href="@Url.Action("Edit", "Files")" class="toolbar-btn">
+            @Html.Partial("Svg/_PencilIcon")
+            Edit
+        </a>*@
+
+    <button class="toolbar-btn toolbar-btn--disabled" id="upLevelBtn">
+        @Html.Partial("Svg/_UpIcon")
+        Up
+    </button>
+
+    <div class="toolbar-btn toolbar-btn--text">
+        @Html.Partial("Svg/_EyeFilledIcon")
+        System Level:&nbsp;<b id="systemLevelText">@ViewBag.SystemLevel</b>
+    </div>
+
+    <button class="toolbar-btn" id="switchViewBtn">
+        @Html.Partial("Svg/_SwitchIcon")
+        Switch view
+    </button>
+
+    <button class="toolbar-btn" id="toggleTreeBtn">
+        @Html.Partial("Svg/_DiagramIcon")
+        <span>View tree</span>
+    </button>
+
+    <button class="toolbar-btn" id="viewNetworkBtn">
+        @Html.Partial("Svg/_NetworkIcon")
+        <span>View full network</span>
+    </button>
+
+    <div class="toolbar-btn">
+        <label class="mb-0 mr-2" for="viewType">View type:</label>
+
+        <select id="viewType" name="viewType">
+            <option value="inOut" selected=@(ViewBag.ViewType == "inOut")>In/out</option>
+            <option value="calibration" selected=@(ViewBag.ViewType == "calibration")>Calibration</option>
+        </select>
+    </div>
+</div>
+
+<div class="file-page-content" style="height:500px;overflow:hidden;">
+    <input hidden value="@ViewBag.FileId" id="fileId" />
+    <input hidden value="@ViewBag.ProjectId" id="projectId" />
+    <input hidden value="@ViewBag.SwapView" id="swapView" />
+    <input hidden value="@ViewBag.FullNet" id="fullNet" />
+    <input hidden value="@ViewBag.WWWRoot" id="wwwroot" />
+    <input hidden value="@ViewBag.DisplayParents" id="displayParents" />
+    <input hidden value="@ViewBag.DisplayEquals" id="displayEquals" />
+    <input hidden value="@ViewBag.DisplayChildren" id="displayChildren" />
+    <input hidden value="@ViewBag.DisplayChildLibraries" id="displayChildLibraries" />
+    <input hidden value="@ViewBag.DisplaySubChildren" id="displaySubChildren" />
+    <input hidden value="@ViewBag.RootSysId" id="rootSysId" />
+    <input hidden value="@ViewBag.DisplayTreeView" id="displayTreeView" />
+    <input hidden type="text" name="relationshipSearch" id="relationshipSearch" />
+
+    <div style="position: relative; flex: 1 1 auto;height:500px;" id="mainView"></div>
+
+    <div class="right-panel small-form-col--45">
+        <div id="subView" style="height: 15rem; border: 1px solid rgba(0, 0, 0, 0.2); margin-bottom: 1rem; position: relative;"></div>
+
+        <form id="signalSearchForm" class="small-form">
+            <div class="row small-form-row">
+                <div class="small-form-col--sm small-form-group small-form-group--left">
+                    <label class="control-label mb-0" for="scope">Scope:</label>
+                </div>
+
+                <div class="small-form-col--lg small-form-group small-form-group--center">
+                    <select id="scope" name="scope" class="form-control">
+                        <option value="inView" selected>In View</option>
+                        <option value="inProject">In Project</option>
+                    </select>
+                </div>
+
+                <div class="small-form-col--md small-form-group small-form-group--right">
+                    <button type="button" id="popUpTrackline" class="btn btn-light main-search-btn form-control" title="Track the Signal">
+                        @Html.Partial("Svg/_TracklineIcon")
+                    </button>
+                </div>
+            </div>
+
+            <div class="row small-form-row">
+                <div class="small-form-col--sm small-form-group small-form-group--left">
+                    <label class="control-label mb-0" for="name">Name:</label>
+                </div>
+
+                <div class="small-form-col--lg small-form-group small-form-group--center">
+                    <input id="name" name="name" class="form-control" />
+                </div>
+
+                <div class="small-form-col--md small-form-group small-form-group--right">
+                    <button disabled type="submit" id="signalSearchBtn" class="btn btn-light main-search-btn form-control" title="Search">
+                        @Html.Partial("Svg/_SearchIcon")
+                    </button>
+                </div>
+
+
+            </div>
+        </form>
+
+        <div id="resultCounterWrapper" class="alert alert-success align-items-center justify-content-center py-1 mb-2" style="display: none;" role="alert">
+            @Html.Partial("Svg/_ResultCheckIcon")
+            <b class="ml-2" id="resultCounter"></b>
+        </div>
+
+        <table class="table table-bordered mb-0">
+            <thead class="thead--primary">
+                <tr>
+                    <th scope="col" class="col" style="width: calc(100% / 3);">
+                        Name
+                    </th>
+                    <th id="signalTableFrom" scope="col" class="col" style="width: calc(100% / 3);">
+                        From
+                    </th>
+                    <th id="signalTableTo" scope="col" class="col" style="width: calc(100% / 3);">
+                        To
+                    </th>
+                </tr>
+            </thead>
+        </table>
+
+        @Html.Partial("_SignalTable")
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/Scripts/pagination.min.js?v=1.0.10.1"></script>
+    <script src="~/Scripts/d3/d3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/themes/default/style.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/jstree.min.js"></script>
+    <script type="module" src="~/Scripts/site/pages/show-file/index.js?v=1.0.10.1"></script>
+}

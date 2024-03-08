@@ -1,0 +1,82 @@
+﻿.main-container {
+    display: -ms-flexbox;
+    display: flex;
+    height: 100%;
+    -ms-flex: 1 1 83%;
+    flex: 1 1 83%;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 80%;
+    max-width: 1000px;
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-top: 10px;
+
+    &.analysize {
+        width: 96%;
+        max-width: 96%;
+        height: 400px;
+    }
+
+    &.uploadView {
+        min-height: 540px;
+        box-sizing: border-box;
+
+        &.formUploadView {
+            min-height: 660px;
+        }
+    }
+
+    &.projectForm {
+        width: 60%;
+        max-width: 600px;
+    }
+
+    &.homeIndex {
+        max-width: 900px;
+
+        .main.homeIndex {
+            max-width: 650px;
+            font-size: 1.1rem;
+            text-align: justify;
+        }
+    }
+
+    .main {
+        width: 100%;
+        min-width: 100%;
+
+        &.uploadView {
+            height: 500px;
+
+            &.stretch {
+                min-height: 700px;
+
+                &.stretch-big {
+                    min-height: 1050px;
+
+                    #basicUploadInfo form #generalFormDiv .uploadInfoPart .optionsContainer .uploadMethodRender #GitPicker{
+                        height: 100px;
+                        overflow: hidden;
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media all and (max-width: 1000px) {
+    .main-container {
+        width: 100%;
+        max-width: 100%;
+
+        &.projectForm {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+}

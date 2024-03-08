@@ -1,0 +1,371 @@
+﻿@model Simulysis.Models.TableView
+@{
+    ViewBag.UtilsForm = "projectSearch";
+    ViewBag.Title = "Projects List";
+    ViewBag.Controller = "Projects";
+    ViewBag.ActiveTab = "All Projects";
+    ViewBag.DeleteForm = "proj-del-form";
+    ViewBag.ItemName = "projects";
+    ViewBag.Title = ViewBag.FileName;
+    ViewBag.CTitle = true;
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+}
+
+
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - Simulysis</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Site/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Simulysis.styles.css" asp-append-version="true" />
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Inter' />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            margin: 0px !important;
+        }
+
+        #tree-%panel {
+            display: inline-block;
+            *display: inline;
+            zoom: 1;
+            vertical-align: top;
+            font-size: 12px;
+        }
+
+        .tableAnalysis {
+            padding:0;
+            list-style: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-start;
+            gap:12px;
+        }
+
+        .analysisBtn {
+            padding: 5px 10px;
+            font-size: 1rem;
+        }
+
+            .analysisBtn:hover {
+                cursor: pointer;
+            }
+
+            .analysisBtn.active {
+                border-radius: 10px;
+            }
+
+        #tabs:hover {
+            cursor: pointer;
+        }
+
+        #addedBtn.active {
+            background-color: green;
+        }
+
+        #changedBtn.active {
+            background-color: yellow;
+        }
+
+        #deletedBtn.active {
+            background-color: red;
+        }
+
+        #impactedBtn.active {
+            background-color: cyan;
+        }
+
+        .changes-list-table-thead-wrap {
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 0;
+        }
+
+        .floatThead-container {
+            background-color: rgba(255, 255, 255, 1)
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex" style="width: 100%;height:90%;min-height:90%;position:relative;">
+        <div class="d-flex flex-column" style="box-shadow: 0 0 10px rgba(0,0,0,0.2); width:250px;">
+            <div class="d-flex align-content-around flex-wrap my-2" style="flex: 0 0 0">
+                <h4 class="mx-1" style="font-size: 14pt; color:#1D5193;">
+                    @ViewBag.OldVersionName <b>vs</b> @ViewBag.NewVersionName
+                </h4>
+            </div>
+
+            <div id="analyse-page"></div>
+
+            <ul id="tabs" class="nav nav-tabs my-1" style="flex: 0 0 0">
+                <li class="nav-item">
+                    <p id="changes-tab" class="nav-link active text-dark">
+                        Changes list
+                    </p>
+                </li>
+                <li class="nav-item">
+                    <p id="folder-tab" class="nav-link text-dark">Tree folder</p>
+                </li>
+            </ul>
+
+            <div class="d-flex flex-column" style="flex: 1 1 0">
+                <div id="changes-list" class="d-flex flex-column" style="flex: 1 1 0">
+                    <ul class="tableAnalysis">
+                        <li class="">
+                            <p id="addedBtn" onclick="filterByCategory('added')" class="analysisBtn text-dark">Added</p>
+                        </li>
+                        <li class="">
+                            <p id="changedBtn" onclick="filterByCategory('changed')" class="analysisBtn text-dark">Changed</p>
+                        </li>
+                        <li class="">
+                            <p id="deletedBtn" onclick="filterByCategory('deleted')" class="analysisBtn text-dark">Deleted</p>
+                        </li>
+                    </ul>
+
+                    <div style="overflow: auto; flex: 1 1 0" id="changes-list-table-wrapper">
+                        <table class="table" id="changes-list-table" style="width: 100%">
+                            <thead style="display:table-header-group;">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Type</th>
+                                    <th>File</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in ViewBag.addedSystemFilesDTO)
+                                {
+                                    @if (item.Name != "")
+                                    {
+                                        <tr class="added compareChange" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                            <td>@item.Id</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.BlockType</td>
+                                            <td style="display:none;"id="projectFileName"></td>
+                                            <td style="visibility:collapse;" id="projectFileId">@item.FK_ProjectFileId</td>
+                                        </tr>
+                                    }
+                                }
+
+                                @foreach (var item in ViewBag.changedSystemFilesDTO)
+                                {
+                                    @if (item.Name != "")
+                                    {
+                                        <tr class="changed compareChange" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                            <td>@item.Id</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.BlockType</td>
+                                            <td style="display:none;"  id="projectFileName"></td>
+                                            <td style="visibility:collapse;" id="projectFileId">@item.FK_ProjectFileId</td>
+                                        </tr>
+                                    }
+                                }
+
+                                @foreach (var item in ViewBag.deletedSystemFilesDTO)
+                                {
+                                    @if (item.Name != "")
+                                    {
+                                        <tr class="deleted compareChange" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                            <td>@item.Id</td>
+                                            <td>@item.Name</td>
+                                            <td>@item.BlockType</td>
+                                            <td style="display:none;" id="projectFileName"></td>
+                                            <td style="visibility:collapse;" id="projectFileId">@item.FK_NewVersionProjectFileID</td>
+                                        </tr>
+                                    }
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="tree-folder" class="d-none overflow: auto; max-height: 100%;">
+                    Folder goes here
+                </div>
+
+            </div>
+        </div>
+
+
+
+        <div class="" style="width:100%;height:95%">
+            <div id="subView" class="" style="height: 600px; width: 100%">
+                <div class="row" id="compareTreePartial" style = "">
+                    @Html.Partial("_CompareTreePartial")
+                </div>
+                <input id="new-ver-id" type="hidden" name="newVersionId" value="@ViewBag.ProjectId" />
+            </div>
+        </div>
+
+        <div id="tree-panel d-none" style="height:360px;" >
+            <div id="helperTooltip" class="helper-tooltip"></div>
+
+            <div class="toolbar">
+                <div class="toolbar-btn" style="display:none">
+                    <label class="mb-0 mr-2" for="viewType">View type:</label>
+
+                    <select id="viewType" name="viewType">
+                        <option value="inOut" selected=@(ViewBag.ViewType == "inOut")>In/out</option>
+                        <option value="calibration" selected=@(ViewBag.ViewType == "calibration")>Calibration</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="file-page-content">
+                <input hidden value="@ViewBag.FileId" id="fileId" />
+                <input hidden value="@ViewBag.ProjectId" id="projectId" />
+                <input hidden value="@ViewBag.SwapView" id="swapView" />
+                <input hidden value="@ViewBag.FullNet" id="fullNet" />
+                <input hidden value="@ViewBag.WWWRoot" id="wwwroot" />
+                <input hidden value="@ViewBag.DisplayParents" id="displayParents" />
+                <input hidden value="@ViewBag.DisplayEquals" id="displayEquals" />
+                <input hidden value="@ViewBag.DisplayChildren" id="displayChildren" />
+                <input hidden value="@ViewBag.DisplayChildLibraries" id="displayChildLibraries" />
+                <input hidden value="@ViewBag.DisplaySubChildren" id="displaySubChildren" />
+                <input hidden value="@ViewBag.RootSysId" id="rootSysId" />
+                <input hidden value="@ViewBag.DisplayTreeView" id="displayTreeView" />
+                <input hidden type="text" name="relationshipSearch" id="relationshipSearch" />
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+
+<script src="~/Scripts/pagination.min.js?v=1.0.10.1"></script>
+<script src="~/Scripts/d3/d3.min.js"></script>
+<script type="module" src="~/Scripts/site/analysis/index.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/themes/default/style.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/jstree.min.js"></script>
+
+<script>
+    let activeCategory = 'deleted';
+
+    function filterByCategory(category) {
+        if (activeCategory == category) {
+            return;
+        }
+
+        const categoryButton = document.getElementById(`${category}Btn`);
+        const previousCategoryButton = document.getElementById(`${activeCategory}Btn`);
+
+        if (previousCategoryButton.classList.contains('active')) {
+            previousCategoryButton.classList.remove('active');
+        }
+
+        if (!categoryButton.classList.contains('active')) {
+            categoryButton.classList.add('active');
+        }
+
+        activeCategory = category;
+
+        const items = document.querySelectorAll(`.${category}`);
+        items.forEach(item => {
+            $(item).show();
+        });
+
+        const allCategories = ['added', 'changed', 'deleted'];
+        allCategories.forEach(toCheckCategory => {
+            if (toCheckCategory != category) {
+                const items2 = document.querySelectorAll(`.${toCheckCategory}`);
+                items2.forEach(item => {
+                    $(item).hide();
+                });
+            }
+        });
+    }
+    function setLayout() {
+        var navbar = document.getElementsByClassName("navBar");
+        if (navbar) {
+            navbar[0].setAttribute("style", "margin: 0px !important");
+        }
+
+        var mainContainer = document.querySelector(".main-container");
+        if (mainContainer) {
+            mainContainer.style.margin = "0px";
+            mainContainer.style.padding = "0px";
+            mainContainer.style.minWidth = "100%";
+        }
+
+        var mainEle = document.querySelector("main");
+        if (mainEle) {
+            mainEle.classList.remove("pb-3");
+        }
+
+        var footerEle = document.querySelector("body > footer");
+        if (footerEle) {
+            footerEle.setAttribute("style", "position: relative");
+        }
+    }
+
+    function switchTab(tabToActivate, tabToDeactivate, contentToActivate, contentToDeactivate) {
+        tabToActivate.classList.add("bg-info", "text-light");
+        tabToDeactivate.classList.remove("bg-info", "text-light");
+        contentToActivate.classList.remove("d-none");
+        contentToDeactivate.classList.add("d-none");
+    }
+
+    var changesTab = document.querySelector("#changes-tab");
+    var folderTab = document.querySelector("#folder-tab");
+    var changesList = document.querySelector("#changes-list");
+    var treeFolder = document.querySelector("#tree-folder");
+
+    changesTab.addEventListener("click", function () {
+        switchTab(changesTab, folderTab, changesList, treeFolder);
+    });
+
+    folderTab.addEventListener("click", function () {
+        switchTab(folderTab, changesTab, treeFolder, changesList);
+    });
+
+    function submitForm() {
+        $("#digDepthForm").submit();
+    }
+
+    function highlightText(element) {
+        element.classList.add("highlighted");
+    }
+
+    function unhighlightText(element) {
+        element.classList.remove("highlighted");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setLayout();
+    });
+    @using Newtonsoft.Json{
+        var deletedLineFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.deletedLineFilesDTO));
+        var addedLineFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.addedLineFilesDTO));
+        var deletedSystemFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.deletedSystemFilesDTO));
+        var addedSystemFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.addedSystemFilesDTO));
+        var changedSystemFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.changedSystemFilesDTO));
+    }
+
+    async function changeDigDepth() {
+        console.log("Dig depth changed");
+
+        var result = await $.get('@Url.Content("~/Analysis/ProjectComparison/DigDepthChange")', { digDepthValue: $("#digDepth").val(), newProjectId: @ViewBag.ProjectId });
+        console.log(result);
+        $("#compareTreePartial").empty();
+        $("#compareTreePartial").html(result);
+
+        var treeImpactSetString = $("#newTreeImpactSet").val();
+        treeImpactSet = JSON.parse(treeImpactSetString);
+
+        console.log(treeImpactSet);
+    }
+
+    filterByCategory('added')
+    $(() => {
+    //    $("#changes-list-table").floatThead({
+    //        scrollContainer: () => $('#changes-list-table-wrapper')
+    //    })
+    //    $('#changes-list-table-wrapper').parent().addClass('changes-list-table-thead-wrap')
+      switchTab(changesTab, folderTab, changesList, treeFolder)
+    })
+</script>

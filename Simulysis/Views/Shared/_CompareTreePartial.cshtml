@@ -1,0 +1,56 @@
+﻿@model Simulysis.Models.TableView
+@{
+    ViewBag.UtilsForm = "projectSearch";
+    ViewBag.Title = "Projects List";
+    ViewBag.Controller = "Projects";
+    ViewBag.ActiveTab = "All Projects";
+    ViewBag.DeleteForm = "proj-del-form";
+    ViewBag.ItemName = "projects";
+    ViewBag.Title = ViewBag.FileName;
+    ViewBag.CTitle = true;
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+    ViewBag.Test = Model.Test;
+}
+
+
+<div class="col-2 position-relative" id="digDepthForm">
+    <div class="row">
+        <select class="" id="digDepth" name="digDepthValue" onchange="changeDigDepth()" >
+            <option class="white" value="" selected disabled >Choose depth</option>
+            <option value="1">Depth: 1</option>
+            <option value="2">Depth: 2</option>
+            <option value="3">Depth: 3</option>
+            <option value="4">Depth: 4</option>
+            <option value="5">Depth: 5</option>
+        </select>
+    </div>
+
+</div>
+
+<button id="impact-analyse-btn" class="btn btn-outline-info" style="display:inline; width: 130px;margin-left: 30px;" onclick="treeImpactAnalyse()">Show Impact</button>
+
+
+<input type="hidden" id="newTreeImpactSet" value='@Json.Serialize(Model.treeImpactSet)' />
+
+<script>
+    document.getElementById('digDepth').value = @ViewBag.digDepthValue;
+</script>
+
+
+
+@*@using (Html.BeginForm("DigDepthChange", "Analysis", FormMethod.Post, new { enctype = "multipart/form-data", @class = "col-2 m-3", id = "digDepthForm" }))
+    {
+        <div class="row">
+            <label asp-for="digDepth" class="sr-only"></label>
+            <select class="form-control btn btn-outline-secondary" id="digDepth" name="digDepthValue" onchange="submitForm()">
+                <option value="" disabled selected>@Html.DisplayNameFor(model => model.digDepth): @ViewBag.digDepthValue</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+        <input id="new-ver-id" type="hidden" name="newVersionId" value="@ViewBag.ProjectId" />
+    }*@
+

@@ -1,0 +1,89 @@
+﻿.treeview {
+    max-height: calc(100vh - 4.5rem - 20px);
+    height: calc(100vh - 4.5rem - 20px);
+    overflow-y: auto;
+    color: $color-primary;
+    font-size: 1.1rem;
+
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+            padding-left: 2.5rem;
+            user-select: none;
+
+            &:not(.treeview-expand) {
+                @include treeview-clickable;
+                position: relative;
+            }
+        }
+    }
+
+    &-caret {
+        @include treeview-clickable;
+        position: relative;
+
+        svg {
+            width: 0.75rem;
+            margin-right: 0.25rem;
+            height: 100%;
+            transform-origin: center center;
+            transform: rotate(-90deg);
+            fill: none;
+            stroke: black;
+            stroke-width: 15px;
+        }
+
+        &--active svg {
+            transform: rotate(-45deg);
+            fill: black;
+            stroke: none;
+        }
+    }
+
+    & &-section {
+        padding: 0.5rem 0;
+        position: relative;
+
+        & > li {
+            padding-left: 0.25rem;
+
+            & > .treeview-caret {
+                svg {
+                    width: 1rem;
+                    min-width: 1rem;
+                    stroke-width: 10px;
+                }
+
+                &--active svg {
+                    transform: rotate(0);
+                    fill: none;
+                    stroke: black;
+                }
+            }
+        }
+    }
+
+    &-nested {
+        display: none;
+
+        &--active {
+            display: block;
+        }
+    }
+
+    &-active-tab {
+        font-weight: 700;
+        position: relative;
+
+        &::before {
+            background-color: rgba($color-dusty-grey, 0.15);
+        }
+
+        &:hover::before {
+            background-color: rgba($color-dusty-grey, 0.25) !important;
+        }
+    }
+}

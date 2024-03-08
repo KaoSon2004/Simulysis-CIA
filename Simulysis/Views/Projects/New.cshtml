@@ -1,0 +1,257 @@
+﻿@model Simulysis.Models.ProjectView
+@if (ViewBag.Status != null && Convert.ToBoolean(ViewBag.Status))
+{
+    if (ViewBag.Message != null)
+    {
+        <h1>Success @ViewBag.Message</h1>
+    }
+}
+else
+{
+    <div class="newProjectForm">
+    </div>
+    <div id="uploadView-page"></div>
+    <div class="flex-container row w-90 ms-auto me-auto" style="display: none;" id="uploadInfoGeneral">
+        <div class="col-3">
+            <a id="backInfo" class="toolbar-btn">
+                <h4>
+                    @Html.Partial("Svg/_JumpBackIcon")
+                    Back
+                </h4>
+            </a>
+        </div>
+
+        <div class="col-9 text-end">
+            <h4 id="currentUploadSummaryDesc">Project:</h4>
+        </div>
+    </div>
+    <div id="chooseUploadType">
+        <div class="title">Choose Upload Type</div>
+        <div id="chooseUploadTypeForm">
+            <div class="uploadNewFileChoice">
+                <div></div>
+                <div class="newProjectBtn">
+                    <div style="display: flex; justify-content:center;align-items:flex-end;"><img src="~/images/addNewProject.png" width="50px" height="50px"></div>
+
+                    <p>Add a new project</p>
+                </div>
+                <div></div>
+            </div>
+            <div class="uploadNewVersionChoice">
+                <div></div>
+                <div class="newVersionBtn">
+                    <div style="display: flex; justify-content:center;align-items:flex-end;"><img src="~/images/uploadNewVersion.png" width="50px" height="50px"></div>
+                    
+                    <p>Add a new version for exist project</p>
+                </div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="basicUploadInfo" style="display:none;">
+        <div class="newProjectTitle">
+            Upload New Project
+        </div>
+        <form class="" method="post" enctype="multipart/form-data">
+            <div id="generalFormDiv">
+                <div class="uploadInfoPart">
+                    <label asp-for="ProjectName" id="ProjectNameLabel" class="input-required">Project name:</label>
+                    <input asp-for="ProjectName" class="inputName" type="text" id="projectName" name="projectName" value="" required>
+                </div>
+
+                <div class="uploadInfoPart">
+                    <label asp-for="OriginalProjectId" class=""></label>
+                    <select class="" asp-for="OriginalProjectId" asp-items="@(new SelectList(Model.ExistingProjectInfos, "ProjectId", "Name"))">
+                    </select>
+                </div>
+
+                <div class="uploadInfoPart">
+                    <label asp-for="Description" id="DescriptionLabel" class="">Project description:</label>
+                    <textarea asp-for="Description" class="textInput" data-val="false"> </textarea>
+                </div>
+
+                <div class="uploadInfoPart" id="uploadMethod">
+
+                    <label class="">Choose upload method:</label>
+                    <div class="optionsContainer">
+                        <div class="choseUploadMethod">
+                            <a class="selected" id="newFromLocal">
+                                From Your Computer
+                            </a>
+                            <a class="" id="newFromGit">
+                                From Git
+                            </a>
+                        </div>
+
+                        @*                        <a class="" id="newVersion" style="display: none">
+                    Proceed
+                    </a>*@
+                        <div class="uploadMethodRender">
+                            <div id="uploadLocalInfo">
+                                <div class="">
+                                    <label asp-for="File" class="input-required"></label>
+                                    <input asp-for="File" class="" type="file">
+                                </div>
+
+
+                            </div>
+
+                            <div id="uploadGitInfo" style="display:none"></div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+            </div>
+            <div class="uploadSubmitBtn">
+                <button class="uploadSubmit" type="submit">Save</button>
+            </div>
+
+
+
+        </form>
+
+
+
+    </div>
+
+
+
+    <div class="modal fade" id="uploadingBlockedModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Uploading blocked.</h5>
+                </div>
+                <div class="modal-body">
+                    Please enter all the required information before continue uploading!
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script>
+        function buildShortUploadSummary() {
+            const projectOrVersionName = $("#projectName").val();
+            const currentOriginalProject = $("#OriginalProjectId").val();
+
+            if (currentOriginalProject == 0) {
+                return `Project <b>${projectOrVersionName}</b>`;
+            } else {
+                return `Project <b>${$("#OriginalProjectId option:selected").text()}</b>/Version <b>${projectOrVersionName}</b>`;
+            }
+        }
+
+        var projectIsGitLookup = {}
+
+        function buildProjectIsGitLookup() {
+        @foreach (var project in Model.ExistingProjectInfos)
+        {
+            <text>projectIsGitLookup[@project.ProjectId] = @(project.IsGitProject ? "true" : "false"); </text>
+        }
+                }
+
+
+
+        function registerButtonCallback() {
+            $("#newFromLocal").click(function () {
+                var uploadView0 = document.getElementsByClassName("uploadView")[0];
+                var uploadView = document.getElementsByClassName("uploadView")[1];
+                uploadView.classList.remove("stretch")
+                uploadView.classList.remove("stretch-big")
+                uploadView0.classList.remove("stretch")
+                uploadView0.classList.remove("stretch-big")
+        @*               if (!$("#projectName").val()) {
+                $("#uploadingBlockedModal").modal("show");
+                return;
+                }*@
+                    this.classList.add("selected")
+                $("#newFromGit").removeClass("selected");
+        @*                $("#generalFormDiv").hide();
+                *@$("#uploadLocalInfo").show();
+        @*                $("#uploadInfoGeneral").show();
+                *@$("#uploadGitInfo").hide();
+        @*$("#uploadMethod").hide();*@
+
+        @*                $("#currentUploadSummaryDesc").html(buildShortUploadSummary());
+                *@            })
+
+            $("#newFromGit").click(function () {
+                var uploadView0 = document.getElementsByClassName("uploadView")[0];
+                var uploadView = document.getElementsByClassName("uploadView")[1];
+                uploadView.classList.add("stretch")
+                uploadView0.classList.add("stretch")
+                this.classList.add("selected")
+        @*                if (!$("#projectName").val()) {
+                $("#uploadingBlockedModal").modal("show");
+                return;
+                }*@
+                    $("#newFromLocal").removeClass("selected");
+        @*$("#basicUploadInfo").hide();*@
+                    $("#uploadLocalInfo").hide();
+                $("#uploadGitInfo").show();
+        @*                $("#uploadInfoGeneral").show();
+                *@               @*$("#uploadMethod").hide();*@
+
+        @*                $("#currentUploadSummaryDesc").html(buildShortUploadSummary());
+                *@
+                    $.ajax({
+                        url: '@Url.Content("~/Projects/NewFromGit?baseProjectId=")' + $("#OriginalProjectId").val(),
+                        cache: false,
+                        contentType: false,
+                        processData: false,
+                        method: 'GET',
+                        type: 'GET', // For jQuery < 1.9
+                        success: function (data) {
+                            $("#uploadGitInfo").empty().append(data)
+                        },
+                        error: function (data) {
+                            alert("Failed to render Git upload view!")
+                        }
+                    });
+            })
+
+            $(".newProjectBtn").click(function () {
+                $(".main-container").addClass("formUploadView");
+                $("#basicUploadInfo").show()
+                $("#chooseUploadType").hide();
+                $(".uploadInfoPart").eq(1).hide();
+                $("#ProjectNameLabel").text("Project name:");
+                $("#DescriptionLabel").text("Project description:");
+            })
+            $(".newVersionBtn").click(function () {
+                $(".main-container").addClass("formUploadView");
+                $("#basicUploadInfo").show()
+                $("#chooseUploadType").hide();
+                $("#ProjectNameLabel").text("Version name:");
+                $("#DescriptionLabel").text("Version description:");
+                $(".newProjectTitle").text("Upload new version")
+            })
+        }
+
+        $(document).ready(function () {
+            buildProjectIsGitLookup();
+            $("#uploadInfoGeneral").hide();
+
+            registerButtonCallback();
+
+            $("#backInfo").click(function () {
+                $("#basicUploadInfo").show();
+                $("#generalFormDiv").show();
+                $("#uploadMethod").show();
+                $("#uploadLocalInfo").hide();
+                $("#uploadGitInfo").empty().hide();
+
+                registerButtonCallback();
+            });
+        })
+    </script>
+}
+
+

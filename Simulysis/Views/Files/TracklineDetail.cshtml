@@ -1,0 +1,42 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    @*<meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="~/css/bootstrap.min.css?v=1.0.9.2" rel="stylesheet" type="text/css" />
+    <link href="~/css/Site/Site.min.css?v=1.0.9.2" rel="stylesheet" type="text/css" />
+    <link href="~/css/pagination.min.css?v=1.0.9.2" rel="stylesheet" type="text/css" />
+    <script src="~/Scripts/modernizr-2.8.3.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">*@
+</head>
+<body>
+    <div id="rendered-data">
+        <!-- This is where the JavaScript object will be rendered -->
+    </div>
+    <script>
+        window.addEventListener("storage", () => {
+                    const data = JSON.parse(window.localStorage.getItem("block"));
+
+        // Create a string to hold the rendered HTML
+        let renderedHTML = '';
+
+        // Loop through the properties of the JavaScript object
+        for (const key in data) {
+            if (data.hasOwnProperty(key)) {
+                renderedHTML += `<p>${key}: ${data[key]}</p>`;
+            }
+        }
+
+        // Update the content of the 'rendered-data' div with the rendered HTML
+        document.getElementById("rendered-data").innerHTML = renderedHTML;
+        })
+
+    </script>
+</body>
+</html>

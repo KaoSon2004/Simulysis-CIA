@@ -1,0 +1,83 @@
+﻿<div class="col-md-3 col-lg-2 border border-dark d-flex flex-column sidebar">
+    <div class="nav-bar">
+
+    </div>
+    <div class="treeview">
+        @*<div class="d-flex justify-content-end">
+            <div id="sidebar-close" class="sidebar_controls-button">
+                @Html.Partial("~/Views/Shared/Svg/_CloseIcon.cshtml")
+            </div>
+        </div>*@
+        <ul class="treeview-section">
+            <li class="treeview-expand">
+                <div class="@(
+                        ViewBag.ActiveTab == "All Projects" || ViewBag.ActiveTab == ViewBag.ProjectName
+                        ? "treeview-caret treeview-caret--active" : "treeview-caret"
+                    )">
+
+                    @Html.Partial("~/Views/Shared/Svg/_CaretOutlined.cshtml")
+                    Projects
+                </div>
+                <ul class="@(
+                        (ViewBag.ActiveTab == "All Projects" || ViewBag.ActiveTab == ViewBag.ProjectName)
+                        ? "treeview-nested treeview-nested--active" : "treeview-nested"
+                    )">
+                    <li class="@(ViewBag.ActiveTab == "All Projects" ? "treeview-active-tab" : "")">
+                        @Html.ActionLink("All Projects", "Index", "Projects")
+                    </li>
+                    @if (ViewBag.ProjectName != null)
+                    {
+                        <li class="@(ViewBag.ActiveTab == ViewBag.ProjectName ? "treeview-active-tab" : "")">
+                            @Html.ActionLink((string)ViewBag.ProjectName, "Index", "Files", new { projectId = ViewBag.ProjectId }, null)
+                        </li>
+                    }
+                </ul>
+            </li>
+        </ul>
+
+        <ul class="treeview-section">
+            <li class="treeview-expand">
+                <div class="@(
+                        @*ViewBag.ActiveTab == "Users"*@
+                            @*|| ViewBag.ActiveTab == "Role"*@
+                        ViewBag.ActiveTab == "Logging"
+                            || ViewBag.ActiveTab == "About"
+                        ? "treeview-caret treeview-caret--active" : "treeview-caret"
+                    )">
+
+                    @Html.Partial("~/Views/Shared/Svg/_CaretOutlined.cshtml")
+                    System
+                </div>
+                <ul class="@(
+                        @*ViewBag.ActiveTab == "Users"
+                            || ViewBag.ActiveTab == "Role"*@
+                        ViewBag.ActiveTab == "Logging"
+                            || ViewBag.ActiveTab == "About"
+                        ? "treeview-nested treeview-nested--active" : "treeview-nested"
+                    )">
+
+                    @*<li class="@(ViewBag.ActiveTab == "Users" ? "treeview-active-tab" : "")">
+                        @if(User.IsInRole("System Admin") || User.IsInRole("Project Admin"))
+                        {
+                            @Html.ActionLink("Users", "Index", "Users")
+                        }
+                        else
+                        {
+                            @Html.ActionLink("Users", "Properties", "Users")
+                        }
+                    </li>
+                    <li>
+                        Role
+                    </li>*@
+                    <li class="@(ViewBag.ActiveTab == "Logging" ? "treeview-active-tab" : "")">
+                        @Html.ActionLink("Logging", "Index", "LogConfig")
+                    </li>
+
+                    <li class="@(ViewBag.ActiveTab == "About" ? "treeview-active-tab" : "")">
+                        @Html.ActionLink("About", "Index", "About")
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>

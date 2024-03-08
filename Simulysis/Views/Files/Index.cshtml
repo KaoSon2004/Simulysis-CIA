@@ -1,0 +1,57 @@
+﻿@{
+    ViewBag.UtilsForm = "fileSearch";
+    ViewBag.Title = "Project Files List";
+    ViewBag.Controller = "Files";
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+    ViewBag.DeleteForm = "file-del-form";
+    ViewBag.ItemName = "files";
+}
+
+<div class="toolbar mb-2">
+    <a href="@Url.Action("New", "Files", new { projectId = ViewBag.ProjectId })" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_PlusIcon.cshtml")
+        New
+    </a>
+
+    @*<a href="@Url.Action("Edit", "Files")" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_PencilIcon.cshtml")
+        Edit
+    </a>*@
+
+    <button type="button" class="toolbar-btn" data-bs-toggle="modal" data-bs-target="#confirmDelete">
+        @Html.Partial("~/Views/Shared/Svg/_TrashIcon.cshtml")
+        <span>
+            Delete
+        </span>
+    </button>
+
+    <div class="d-flex flex-row text-center w-100">
+        <div class="d-flex flex-row text-center col-10">
+            <span class="toolbar-btn">Versions</span>
+
+            <select class="form-control" id="versionSelect" style="display: inline-block" class="w-100" asp-items="@(new SelectList(Model.ProjectVersions, "ProjectId", "Name"))">
+            </select>
+        </div>
+
+        <button type="button" class="toolbar-btn-special btn col-2 ms-4" id="btnNewVersion">
+            <span>New version</span>
+        </button>
+    </div>
+</div>
+
+@Html.Partial("~/Views/Shared/_Table.cshtml")
+
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    $("#versionSelect").val("@ViewBag.ProjectId")
+
+    $("#versionSelect").change(function()
+    {
+        window.location.href = `/Files/Index/${$(this).val()}`
+    })
+
+    $("#btnNewVersion").click(function()
+    {
+        window.location.href = `/Projects/New?baseProjectId=${@ViewBag.BaseProjectId}`
+    })
+</script>

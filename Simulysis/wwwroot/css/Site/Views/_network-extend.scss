@@ -1,0 +1,37 @@
+﻿.network-extend-view {
+    .col {
+        position: relative;
+
+        &__icon {
+            position: absolute;
+            height: 100%;
+            width: fit-content;
+            display: inline-flex;
+            align-items: center;
+            top: 50%;
+            transform: translateY(-50%);
+
+
+            &--right {
+                right: 0.5rem;
+            }
+
+            &--center {
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+            }
+
+            &--thead {
+                & svg {
+                    fill: white;
+                }
+            }
+
+            & svg {
+                width: 1.1rem;
+                height: auto;
+            }
+        }
+    }
+
+}

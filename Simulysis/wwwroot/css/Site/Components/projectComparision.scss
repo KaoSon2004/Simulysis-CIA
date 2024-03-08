@@ -1,0 +1,123 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Roboto:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');
+
+#projectComparision {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 30px;
+    padding-bottom: 30px;
+
+
+    .analysisFormTitle {
+        color: $color-primary;
+        font-size: 2.2rem;
+        font-family: 'Roboto', sans-serif;
+        margin-bottom: 30px;
+        font-weight: 500;
+    }
+
+    .compareInfoPart {
+        max-width: 400px;
+        width: 74%;
+        flex-direction: column;
+        align-items: flex-start;
+        display: flex;
+
+        #projectSelector {
+            width: 100%;
+            height: 45px;
+            padding: 6px 12px 6px 16px;
+            color: $text-color;
+            /*            border: none;
+            border-bottom: 1px solid $text-color;*/
+            /*            outline: none;*/
+            border-radius: 20px;
+            margin-top: 6px;
+            outline: 1px;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+    }
+
+    .title {
+        color: $color-primary;
+        font-weight: 500;
+        font-size: 1.1rem;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    #versionPicker {
+        max-width: 400px;
+        width: 74%;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+
+        form {
+            width: 100%;
+        }
+
+        .compareInfoPart {
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+            display: flex;
+
+
+            #oldVersion, #newVersion {
+                max-width: 100%;
+                width: 100%;
+                height: 45px;
+                font-size: 1.1rem;
+                color: $text-color;
+                /*                border: none;
+                border-radius: 0;
+                border-bottom: 1px solid $text-color;
+                outline: none;*/
+                border-radius: 20px;
+                background: transparent;
+                margin-bottom: 30px;
+                outline: 1px;
+                border: 1px solid;
+                margin-top: 6px;
+                text-align: center;
+
+                &:focus {
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+
+    .buttonContainer {
+        display: flex;
+        justify-content: center;
+        margin-top: 50px;
+
+        .comparisonSubmit {
+            border: none;
+            background: $color-primary;
+            padding: 8px 25px;
+            color: white;
+            border-radius: 15px;
+        }
+    }
+
+    .alert {
+        margin-top: 10px;
+        margin-bottom: -30px;
+        padding: 5px;
+        text-align: center;
+        color: forestgreen;
+        border-radius: 5px;
+    }
+}
+
+@media all and (max-width: 600px) {
+    #projectComparision {
+        .compareInfoPart, #versionPicker {
+            width: 100%;
+        }
+    }
+}

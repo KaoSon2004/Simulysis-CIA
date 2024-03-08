@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Simulysis</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/Site/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/Simulysis.styles.css" asp-append-version="true" />
+    <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Inter'>
+
+</head>
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<body>
+    <div id="layout" style="display:flex; flex-direction:column;min-height:100%">
+        <header>
+            <div class="navBar">
+                <div id="navbar-simulysis">
+                    <div class="logoPart">
+                        <a asp-controller="Home" asp-action="Index" class="">
+
+                            <div class="logo">
+                                <img src="~/images/_logo.svg" />
+                            </div>
+                            <div class="slogan">
+                                <div class="">
+                                    <h5>
+                                        SIMULYSIS
+                                    </h5>
+                                </div>
+                                <div class="">
+                                    <p>
+                                        SQA LAB
+                                    </p>
+                                </div>
+                            </div>
+
+                        </a>
+                    </div>
+                    
+
+                    <div class="navMenu">
+                        <ul class="navList">
+                            <li class="navItem home onPage">
+                                <a class="" asp-controller="Home" asp-action="Index">
+                                    <p>HOME</p>
+                                </a>
+                            </li>
+                            <li class="navItem project">
+                                <a class="" asp-controller="Projects" asp-action="Index">
+                                    <p>PROJECT</p>
+                                </a>
+                            </li>
+                            <li class="navItem analysis">
+                                <a class="" asp-controller="Analysis" asp-action="ProjectComparison">
+                                    <p>
+                                        ANALYSIS
+                                    </p>
+                                </a>
+                            </li>
+                            <li class="navItem about">
+                                <a class="" asp-controller="About" asp-action="Index">
+                                    <p>
+                                        ABOUT
+                                    </p>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <!---Main container class is for JS JQuery code to append elements-->
+        <div class="main-container" style="box-shadow: 0 0.25rem 0.75rem 0.2rem rgba(0, 0, 0, .25) ;">
+            <div class="main" >
+                @RenderBody()
+            </div>
+        </div>
+
+        <div class="d-flex text-muted" style="height: 120px; align-items:center; justify-content: center">
+            <div class="container-fluid text-center" >
+                &copy; 2023 - Simulysis - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/floatthead/2.2.5/jquery.floatThead.min.js" integrity="sha512-131fDtJKn0jUOqN1sfcHkBZHRmTCP0gmcpztVNuE3M8toiuIv8V9I+tpL/1t3GFDBcigLyB2hWJ3ZNjYwEO4bg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

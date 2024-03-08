@@ -1,0 +1,23 @@
+﻿.uploadInfoPart {
+    margin: 5% 18%;
+    font-size: 22px;
+    font-family: 'Inter';
+}
+
+
+.uploadInfoPart label {
+    display: inline-block;
+    width: 30%;
+    float: left;
+}
+
+.uploadSubmit {
+    border: none;
+    margin-left: 72%;
+    background-color: white;
+}
+
+.input-required::after {
+    content: "*";
+    color: red;
+}

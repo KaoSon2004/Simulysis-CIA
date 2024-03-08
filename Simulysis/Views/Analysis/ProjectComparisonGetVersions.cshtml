@@ -1,0 +1,61 @@
+﻿@model AnalysisView
+
+@using (Html.BeginForm("CompareProjects", "Analysis", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div class="compareInfoPart">
+        @{
+            List<dynamic> paginatedItems = Model.PaginatedItems();
+        }
+        <div><label asp-for="NewVersion" class="title"></label></div>
+
+        <select asp-for="NewVersion" class="form-control" id="newVersion" name="newVersionId">
+            <option value="">-- Select Project --</option>
+            @foreach (var item in paginatedItems)
+            {
+                <option value="@item.GetType().GetProperty("Id").GetValue(item)">
+                    @item.GetType().GetProperty("Version").GetValue(item)
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="compareInfoPart">
+        <div><label asp-for="OldVersion" class="title"></label></div>
+
+        <select asp-for="OldVersion" class="form-control" id="oldVersion" name="oldVersionId">
+            <option value="">-- Select Project --</option>
+            @foreach (var item in paginatedItems)
+            {
+                <option value="@item.GetType().GetProperty("Id").GetValue(item)">
+                    @item.GetType().GetProperty("Version").GetValue(item)
+                </option>
+            }
+        </select>
+    </div>
+
+    <input id="old-ver-name" type="hidden" name="oldVersionName" value="" />
+    <input id="new-ver-name" type="hidden" name="newVersionName" value="" />
+    @if (TempData["AlertMessage"] != null)
+    {
+        <div class="alert ">
+            @TempData["AlertMessage"]
+        </div>
+    }
+    <div class="buttonContainer"><button class="comparisonSubmit" type="submit" name="mine">Save</button></div>
+
+}
+
+
+<script>
+    document.getElementById("newVersion").addEventListener("change", function () {
+        var newVersionOpt = document.getElementById("newVersion");
+        var newVerName = newVersionOpt.options[newVersionOpt.selectedIndex].text;
+        document.getElementById("new-ver-name").value = newVerName;
+    });
+
+    document.getElementById("oldVersion").addEventListener("change", function () {
+        var oldVersionOpt = document.getElementById("oldVersion");
+        var oldVerName = oldVersionOpt.options[oldVersionOpt.selectedIndex].text;
+        document.getElementById("old-ver-name").value = oldVerName;
+    });
+</script>

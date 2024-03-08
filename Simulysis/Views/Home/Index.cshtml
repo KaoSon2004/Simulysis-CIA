@@ -1,0 +1,144 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+
+}
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Introduction</title>
+    <style>
+        h1, h2 {
+            text-align: center;
+            color: #1D5193;
+        }
+        .title-block {
+            display: flex;
+            justify-content: center;
+        }
+
+        .method-block {
+            display:flex;
+            height: 300px;
+        }
+
+        .content-side {
+            width: 45%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: justify;
+        }
+
+        .title-block .content-side {
+            width: 70%;
+        }
+
+        .image-side {
+            width: 45%;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+        }
+        .space-side {
+            width: 10%;
+        }
+        .resize-image {
+            width: auto;
+            height: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="title-block">
+        <div class="content-side">
+            <h1>Introduction</h1>
+            <p>
+            <p>Visualization and analysis systems for automotive models are essential for businesses to achieve the best model design before transitioning to hardware implementation. Simulink is a well-known simulation software developed by MathWorks. However, with limitations such as slow execution speed and difficulty displaying large data, this research delves into the construction and development of the Structural Visualize Platform (Simulysis).</p>
+            <p>Simulysis is a tool that processes Matlab Simulink models on the web using the MVC model and .NET Framework. While Simulink is used to design models, Simulysis provides advanced features based on these models, related to the analysis and visualization of these models. The tool has basic Simulink features such as viewing and interacting with models (Model view). However, Simulysis is designed to optimize performance with large, complex projects, which Simulink has not been able to do. Additionally, the tool has unique features that Simulink currently (version R2023a) does not have, including relationship grid display (Network view), signal search, and signal tracing.</p>
+            </p>
+        </div>
+    </div>
+    <br />
+    <br />
+    <div class="medthods">
+        <div class="method-block">
+            <div class="content-side">
+                <h2>
+                    Data modeling
+                </h2>
+                <p>
+                    Data is modeled using the D3.js library for web-based graphics allowing data visualization. SVG format is used to represent two-dimensional graphic objects and support user interaction. Blocks are modeled based on Matlab drawings and are included in the <g> element, and seams are represented by a <line> or <path> element. Information about blocks and connections is queried from the database to determine the correct shape and path.
+                </p>
+            </div>
+            <div class="space-side"> </div>
+            <div class="image-side">
+                <img class="resize-image" src="@Url.Content("~/images/data-modeling.png")" alt="image" />
+            </div>
+        </div>
+        <br />
+        <br />
+        <div class="method-block">
+            <div class="image-side">
+                <img class="resize-image" src="@Url.Content("~/images/block-modeling.png")" alt="image" />
+            </div>
+            <div class="space-side"> </div>
+            <div class="content-side">
+                <h2>
+                    Block modeling
+                </h2>
+                <p>
+                    Block information allows default modeling of all Blocks as rectangles with the block type name in the middle. Different types of Blocks are represented in different ways, not just as rectangles but as circles, triangles or special shapes. Based on the Block model in Matlab to represent some special Blocks, those types that do not have their own representation will be represented by default.
+                </p>
+                <a>
+
+                </a>
+            </div>
+        </div>
+        <br />
+        <br />
+        <div class="method-block">
+            <div class="content-side">
+                <h2>
+                    Relationship network
+                </h2>
+                <p>
+                    Relational networks represent files as tables, placed on layers of circles, connected by links, with a central table representing the file being viewed by the user. Files related to the file being viewed in the relational network will be clustered based on the name of the directory it is located in, each of which is called a function group. The tables are evenly and beautifully spaced, based on the designed drawing algorithm.
+                </p>
+            </div>
+            <div class="space-side"> </div>
+            <div class="image-side">
+                <img class="resize-image" src="@Url.Content("~/images/relationship-network.png")" alt="image" />
+            </div>
+        </div>
+
+        <br />
+        <br />
+        <div class="method-block">
+            <div class="image-side">
+                <img class="resize-image" src="@Url.Content("~/images/signal-tracing.png")" alt="image" />
+            </div>
+            <div class="space-side"> </div>
+            <div class="content-side">
+                <h2>Signal tracing</h2>
+                <p>
+                    Trace Signal to their source and destination is an essential field of model development and analysis. This process allows engineers, scientists and researchers to gain insights into how data flows through complex systems. It provides deciphering how various components and subsystems interact with one another.
+                </p>
+            </div>
+        </div>
+        <br />
+        <br />
+
+    </div>
+
+
+</body>
+
+
+

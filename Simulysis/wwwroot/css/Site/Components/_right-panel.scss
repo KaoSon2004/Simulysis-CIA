@@ -1,0 +1,92 @@
+﻿.right-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 22rem;
+    width: 22rem;
+    padding: 0 1.25rem;
+    position: relative;
+    transform: translateX(1rem);
+    border-left: 1px solid rgba($color-dusty-grey, 0.4);
+
+    .small-form {
+        padding: 0 1rem;
+
+        &-row {
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        &-col {
+            &--sm {
+                flex: 0 0 20%;
+                max-width: 20%;
+            }
+
+            &--md {
+                flex: 0 0 30%;
+                max-width: 30%;
+            }
+
+            &--lg {
+                flex: 0 0 50%;
+                max-width: 50%;
+            }
+
+            &--xs {
+                flex: 0 0 10%;
+                max-width: 10%;
+            }
+
+            &--35 {
+                flex: 0 0 35%;
+                max-width: 35%;
+            }
+
+            &--45 {
+                flex: 0 0 45%;
+                max-width: 45%;
+            }
+        }
+
+        &-group {
+            padding: 0;
+            display: flex;
+            align-items: center;
+
+            &--left {
+                padding-right: 0.35rem;
+            }
+
+            &--right {
+                padding-left: 0.35rem;
+            }
+
+            &--center {
+                padding: 0 0.35rem;
+            }
+        }
+
+        input {
+            padding: 0 0.25rem;
+            height: fit-content;
+        }
+
+        select {
+            padding: 0;
+            height: fit-content;
+        }
+    }
+
+    .signal-table {
+        overflow-y: overlay;
+        height: 13rem;
+        padding-right: 1rem;
+        margin-right: -1rem;
+        flex: 1 1 auto;
+    }
+
+    table td,
+    table th {
+        padding: 0.25rem 0.5rem;
+    }
+}

@@ -1,0 +1,48 @@
+﻿
+@{
+    ViewBag.Title = "View Log File";
+}
+<head>
+    <style>
+       
+        .file-content{
+            max-height:80vh;
+            overflow:auto;
+        }
+        .back {
+            display: flex;
+            justify-content:flex-end;
+            
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button class="toolbar-btn">
+            @Html.Partial("Svg/_JumpBackIcon")
+            @Html.ActionLink("Back", "Index", "LogConfig")
+        </button>
+        <button class="toolbar-btn">
+            @Html.Partial("Svg/_DownloadIcon")
+            @Html.ActionLink("Download ", "Download", "LogConfig")
+        </button>
+    </div>
+    <div class="container">
+
+        <div class="file-content">
+            @{
+
+                foreach (string line in ViewBag.Lines)
+                {
+                    <p>@line</p>
+                }
+            }
+
+        </div>
+       
+    </div>
+</body>
+
+
+

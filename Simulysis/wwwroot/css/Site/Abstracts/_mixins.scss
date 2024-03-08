@@ -1,0 +1,28 @@
+﻿@mixin absolute-vertical-center {
+    position: absolute;
+    transform: translateY(-50%);
+    top: 50%;
+}
+
+@mixin treeview-clickable {
+    display: flex;
+    align-items: center;
+    word-break: break-word;
+    padding-right: 0.5rem;
+
+    &::before {
+        content: "";
+        position: absolute;
+        height: 100%;
+        left: -.25rem;
+        width: calc(100% + .25rem);
+    }
+
+    &:hover {
+        cursor: pointer;
+
+        &::before {
+            background: rgba($color-dusty-grey, 0.15);
+        }
+    }
+}

@@ -1,0 +1,46 @@
+﻿.custom-menu {
+    display: none;
+    z-index: 1000;
+    position: absolute;
+    overflow: hidden;
+    border: 1px solid #CCC;
+    white-space: nowrap;
+    font-family: sans-serif;
+    background: #FFF;
+    color: #333;
+    border-radius: 5px;
+    width: 150px;
+    padding-left: 0px
+}
+
+.custom-menu li {
+    display: block;
+    list-style-type: none;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.custom-menu li:hover {
+    background-color: #DEF;
+}
+
+.loaderTraceSignal {
+    border: 2px solid #f3f3f3;
+    /* Light grey */
+    border-top: 2px solid #3498db;
+    /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

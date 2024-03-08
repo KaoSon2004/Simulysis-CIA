@@ -1,0 +1,66 @@
+#digDepthForm {
+    width: 100px;
+    padding: 0;
+    margin-left: 40px;
+    height: 100%;
+
+    #digDepth {
+        padding: 6px 12px;
+        border-radius: 4px;
+        color: #6c757d;
+        border-color: #6c757d;
+
+        height:40px;
+
+
+        &:hover {
+            background-color: rgb(128, 128, 128, 0.15);
+            border-color: #6c757d;
+        }
+    }
+
+  
+}
+button#impact-analyse-btn, button#file-impact-analyse-btn {
+    height: 40px;
+    margin-left:10px;
+    &:focus {
+        background: transparent;
+        color: rgb(13, 202, 240);
+        box-shadow: none;
+    }
+
+    &:hover {
+        background: transparent;
+        color: rgb(13, 202, 240);
+    }
+
+    &.active {
+        color: #000;
+        background-color: #0dcaf0;
+        border-color: #0dcaf0;
+    }
+}
+
+#impactedDigDepth {
+    #impactedDig {
+        padding: 6px 12px;
+        border-radius: 4px;
+        color: #6c757d;
+        border-color: #6c757d;
+        width: 100px;
+        padding: 0;
+        margin-left: 40px;
+        height: 100%;
+
+
+        &:hover {
+            background-color: rgb(128, 128, 128, 0.15);
+            border-color: #6c757d;
+        }
+    }
+}
+
+#compareTreePartial {
+    height:40px;
+}

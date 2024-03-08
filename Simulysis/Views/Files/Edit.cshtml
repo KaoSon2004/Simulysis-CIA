@@ -1,0 +1,104 @@
+﻿@model Simulysis.Models.EditFileView
+@{
+    ViewBag.Title = $"File Edit: {ViewBag.FileName}";
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+    ViewBag.Controller = "Files";
+}
+
+<div class="modal fade" id="edit-loader" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="edit-loader-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="edit-loader-label">Uploading...</h5>
+            </div>
+            <div class="modal-body">
+                Please wait. Your file is being uploaded.
+                <div class="progress mt-2">
+                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toolbar">
+
+    <a href="@Url.Action("Index", "Files", new { projectId = Convert.ToInt64(ViewContext.RouteData.Values["projectId"]) })" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_JumpBackIcon.cshtml")
+        Back
+    </a>
+
+    <button type="submit" form="file-edit-form" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_SaveIcon.cshtml")
+        <span>
+            Save
+        </span>
+    </button>
+</div>
+
+@if (ViewBag.Status != null && Convert.ToBoolean(ViewBag.Status))
+{
+    if (ViewBag.Message != null)
+    {
+<div class="alert alert-success mt-2">
+    <strong>Success!</strong> @ViewBag.Message
+</div>
+    }
+}
+else
+{
+    using (Html.BeginForm("Edit", "Files", FormMethod.Post, new { enctype = "multipart/form-data", id = "file-edit-form", @class = "custom-form" }))
+    {
+@Html.AntiForgeryToken()
+
+        if (ViewBag.Message != null)
+        {
+<div class="alert alert-danger form-error-msg mb-4">
+    <strong>Error!</strong> @ViewBag.Message
+</div>
+        }
+
+<div class="form-group row no-gutters">
+    @Html.LabelFor(m => m.File, htmlAttributes: new { @class = "control-label col-12 col-sm-4 col-lg-3" })
+    <div class="col-12 col-sm-8 col-lg-9">
+        @Html.TextBoxFor(m => m.File, null, new { type = "file", @class = "form-control-file" })
+        @Html.ValidationMessageFor(model => model.File, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group row no-gutters">
+    @Html.LabelFor(m => m.Description, htmlAttributes: new { @class = "control-label col-12 col-sm-4 col-lg-3" })
+    <div class="col-12 col-sm-8 col-lg-9">
+        @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5 })
+        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="alert alert-success" role="alert">
+    <h6 class="alert-heading font-weight-bold">Note</h6>
+    <p>
+        Your old file will be replaced with the new one. If you decide to replace this, choose the new file with
+        allowed extensions and click "Save" button. The old file will be deleted.
+    </p>
+    <hr>
+    <h6 class="alert-heading font-weight-bold">ご案内</h6>
+    <p class="mb-0">
+        元のファイルが新たなのに置き換えられます。その場合は、許可された拡張機能を選択して
+        「保存」のボタンをクリックしてください。元のファイルが削除されます。
+    </p>
+</div>
+    }
+}
+
+<script>
+    document.querySelector('#file-edit-form').addEventListener('submit', function handleUpload(e) {
+        e.preventDefault()
+
+        $('.field-validation-error.text-danger').empty()
+        $('.form-error-msg').hide()
+
+        $('#edit-loader').modal('show')
+
+        $('#file-edit-form').submit()
+    })
+</script>

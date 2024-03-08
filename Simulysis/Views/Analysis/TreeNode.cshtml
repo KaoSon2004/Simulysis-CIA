@@ -1,0 +1,638 @@
+﻿@model Simulysis.Views.Analysis.ShowModel
+@{
+    ViewBag.UtilsForm = "projectSearch";
+    ViewBag.Title = "Projects List";
+    ViewBag.Controller = "Projects";
+    ViewBag.ActiveTab = "All Projects";
+    ViewBag.DeleteForm = "proj-del-form";
+    ViewBag.ItemName = "projects";
+    ViewBag.Title = ViewBag.FileName;
+    ViewBag.CTitle = true;
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<style>
+    #deletedTag {
+        background-color: rgba(255, 0, 0, 0.2);
+        border: none;
+        color: black;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    #changedTag {
+        background-color: rgba(255, 165, 0, 0.2);
+        border: none;
+        color: black;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    #addedTag {
+        background-color: rgba(0, 255, 0, 0.2);
+        border: none;
+        color: black;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+
+    .centered {
+        left: 50%;
+        top: 50%;
+        position: absolute;
+        transform: translate(-50%, -50%);
+    }
+
+    .highlighted {
+        background-color: lightgray;
+        cursor: pointer; /* Change the cursor to a pointer */
+    }
+
+    .filter-button {
+        background-color: lightgray;
+        margin: 5px;
+    }
+
+        .filter-button.active.added {
+            background-color: green;
+        }
+
+        .filter-button.active.changed {
+            background-color: orange;
+        }
+
+        .filter-button.active.deleted {
+            background-color: red;
+        }
+
+    .highlight-text {
+        display: block;
+    }
+
+        .highlight-text.added {
+            display: block;
+        }
+
+        .highlight-text.changed {
+            display: block;
+        }
+
+        .highlight-text.deleted {
+            display: block;
+        }
+
+    /* Unclicked state (light background) */
+    #searchButton {
+        background-color: lightgray;
+    }
+
+        /* Clicked state (darker background) */
+        #searchButton.clicked {
+            background-color: darkgray;
+        }
+
+    #addedBtn, #changedBtn, #deletedBtn, #impactedBtn {
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+        #addedBtn.active {
+            background-color: green;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        #changedBtn.active {
+            background-color: yellow;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        #deletedBtn.active {
+            background-color: red;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        #impactedBtn.active {
+            background-color: cyan;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+    .removed-change-invisible {
+        display: none;
+    }
+
+    .changes-list-table-thead-wrap {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 0;
+    }
+
+    .floatThead-container {
+        background-color: rgba(255, 255, 255, 1)
+    }
+
+    .clickable-header {
+        cursor: pointer;
+    }
+</style>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom box-shadow">
+
+
+    <div class="container-fluid">
+        <div class="row navbar-brand d-i align-items-center gap-3">
+            <div class="logo col">
+                <img src="~/images/_logo.svg" />
+            </div>
+            <div class="content col">
+                <h3>
+                    Simulysis
+                </h3>
+                <p>
+                    SQA Lab
+                </p>
+            </div>
+        </div>
+        <b id="pageTitle" style="font-size:18pt; color:#1D5193">File name: @ViewBag.Title</b>
+
+    </div>
+</nav>
+
+<div class="d-flex">
+    <p style="display:none" id="treenode"></p>
+    <div class="d-flex flex-column col-sm-3 px-lg-3 px-md-2 px-sm-1" style="box-shadow: 0 0 10px rgba(0,0,0,0.2);">
+        <p style="display:none" id="globalVisibility">0</p>
+
+        <div class="py-1" style="flex: 0 0 1; position: relative;">
+            <span style="color: #1d5193; font-size: 23px;">Changes List</span>
+        </div>
+
+        <div class="py-1" style="position: relative; display: flex; flex: 0 0 0">
+            <input type="text" id="searchInput" placeholder="Search..." style="flex-grow: 1; margin-right: 10px;">
+            <button id="searchButton" onclick="searchItems()">
+                <i class="fas fa-search"></i> <!-- Font Awesome magnifying glass icon -->
+            </button>
+        </div>
+        <div id="file-analyse"></div>
+        <div style="flex: 1 1 0" class="d-flex flex-column">
+            <div id="changes-list" class="d-flex flex-column" style="flex: 1 1 0">
+                <ul class="nav nav-bar">
+                    <li class="nav-item">
+                        <p id="addedBtn" onclick="filterByCategory('added')" class="nav-link text-dark active">Added</p>
+                    </li>
+                    <li class="nav-item">
+                        <p id="changedBtn" onclick="filterByCategory('changed')" class="nav-link text-dark">Changed</p>
+                    </li>
+                    <li class="nav-item">
+                        <p id="deletedBtn" onclick="filterByCategory('deleted')" class="nav-link text-dark">Deleted</p>
+                    </li>
+                    <li class="nav-item">
+                        <p id="impactedBtn" onclick="filterByCategory('impacted')" class="nav-link text-dark">Impacted</p>
+                    </li>
+                </ul>
+
+                <div style="overflow: auto; flex: 2 2 0; min-height: 300px" id="changes-list-table-wrapper">
+                    <table class="table" id="changes-list-table" style="width: 100%">
+                        <thead style="display:table-header-group;">
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Visibility</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in ViewBag.addedSystemFilesDTO)
+                            {
+                                @if (item.Name != "" && item.FK_ProjectFileId == ViewBag.FileId)
+                                {
+                                    <tr class="added" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                        <td id="id">@item.Id</td>
+                                        <td id="name">@item.Name</td>
+                                        <td>@item.BlockType</td>
+                                        <td id="visibility"><i class="fas fa-eye-slash"></i></td>
+                                        <td style="visibility:collapse;display:none;" id="visibilityValue">0</td>
+                                        <td style="visibility:collapse;display:none" id="projectFileId">@item.FK_ProjectFileId</td>
+                                    </tr>
+                                }
+                            }
+
+                            @foreach (var item in ViewBag.changedSystemFilesDTO)
+                            {
+                                @if (item.Name != "" && item.FK_ProjectFileId == ViewBag.FileId)
+                                {
+                                    <tr class="changed" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                        <td id="id">@item.Id</td>
+                                        <td id="name">@item.Name</td>
+                                        <td>@item.BlockType</td>
+                                        <td id="visibility"><i class="fas fa-eye-slash"></i></td>
+                                        <td style="visibility:collapse;display:none;" id="visibilityValue">0</td>
+                                        <td style="visibility:collapse;display:none;" id="projectFileId">@item.FK_ProjectFileId</td>
+                                    </tr>
+                                }
+                            }
+
+                            @foreach (var item in ViewBag.deletedSystemFilesDTO)
+                            {
+                                @if (item.Name != "" && item.FK_NewVersionProjectFileID == ViewBag.FileId)
+                                {
+                                    <tr class="deleted" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                        <td id="id">@item.Id</td>
+                                        <td id="name">@item.Name</td>
+                                        <td>@item.BlockType</td>
+                                        <td id="visibility"><i class="fas fa-eye-slash"></i></td>
+                                        <td style="visibility:collapse;display:none;" id="visibilityValue">0</td>
+                                        <td style="visibility:collapse;display:none;" id="projectFileId">@item.FK_NewVersionProjectFileID</td>
+                                    </tr>
+                                }
+                            }
+                            @foreach (var item in ViewBag.deletedSystemFilesDTO)
+                            {
+                                @if (item.Name != "" && item.FK_NewVersionProjectFileID == ViewBag.FileId)
+                                {
+                                    <tr class="deleted" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" style="font-size: 10px;">
+                                        <td id="id">@item.Id</td>
+                                        <td id="name">@item.Name</td>
+                                        <td>@item.BlockType</td>
+                                        <td id="visibility"><i class="fas fa-eye-slash"></i></td>
+                                        <td style="visibility:collapse;display:none;" id="visibilityValue">0</td>
+                                        <td style="visibility:collapse;display:none;" id="projectFileId">@item.FK_NewVersionProjectFileID</td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="d-flex flex-row ms-auto mt-2">
+                    <button id="displayAllChanges" class="btn btn-secondary" type="button">Display all</button>
+                    <button id="hideAllChanges" class="btn btn-secondary ms-2" type="button">Hide all</button>
+                </div>
+            </div>
+
+            <div class="p-2" id="impactedItems">
+                <span style="color: purple">Impacted</span>
+                @foreach (var item in ViewBag.impactSetSystemDTO)
+                {
+                    @if (item.Name != "" && item.FK_NewVersionProjectFileID == ViewBag.FileId)
+                    {
+                        <div class="highlight-text deleted" onmouseover="highlightText(this)" onmouseout="unhighlightText(this)" onclick="toggleProperties(this)">
+                            <span id="@item.Id @item.Name @item.FK_NewVersionProjectFileID" style="color: purple; font-size: 10px;">
+                                <span class="highlight-name" style="color: purple; font-size: 10px;">Name: @item.Name</span>
+                                <span class="highlight-blocktype" style="color: purple; font-size: 10px;">BlockType: @item.BlockType</span>
+                                <span class="highlight-id" style="color: purple; font-size: 10px;">Id: @item.Id</span>
+                                <div class="item-properties" style="padding-left: 10px; display: none; white-space: normal; word-wrap: break-word;">
+                                    Properties: @item.Properties
+                                </div>
+                            </span>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex flex-column " style="width: 100%">
+        <div class="d-flex" style="margin-top: 20px">
+            
+            <div id="impactedDigDepth"></div>
+            <button id="file-impact-analyse-btn" class="btn btn-outline-info" style="display:inline; width: 130px;margin-left: 20px;" onclick="fileImpactAnalyse()">Show Impact</button>
+            
+        </div>
+
+        <div style="position: relative; flex: 1 1 auto" id="mainView"></div>
+    </div>
+    <div id="analyse-page"></div>
+
+</div>
+
+
+<div class="toolbar d-none">
+    <a href="@Url.Action("Index", "Files", new { projectId = Convert.ToInt64(ViewBag.ProjectId) })" class="toolbar-btn d-none">
+        @Html.Partial("Svg/_JumpBackIcon")
+        Back
+    </a>
+
+    @*<a href="@Url.Action("Edit", "Files")" class="toolbar-btn">
+    @Html.Partial("Svg/_PencilIcon")
+    Edit
+    </a>*@
+
+    <button class="toolbar-btn toolbar-btn--disabled d-none" id="upLevelBtn">
+        @Html.Partial("Svg/_UpIcon")
+        Up
+    </button>
+
+    <div class="toolbar-btn toolbar-btn--text d-none">
+        @Html.Partial("Svg/_EyeFilledIcon")
+        System Level:&nbsp;<b id="systemLevelText">@ViewBag.SystemLevel</b>
+    </div>
+
+    <button class="toolbar-btn d-none" id="switchViewBtn">
+        @Html.Partial("Svg/_SwitchIcon")
+        Switch view
+    </button>
+
+    <button class="toolbar-btn d-none" id="toggleTreeBtn">
+        @Html.Partial("Svg/_DiagramIcon")
+        <span>View tree</span>
+    </button>
+
+    <button class="toolbar-btn d-none" id="viewNetworkBtn">
+        @Html.Partial("Svg/_NetworkIcon")
+        <span>View full network</span>
+    </button>
+
+    <div class="toolbar-btn d-none">
+        <label class="mb-0 mr-2" for="viewType">View type:</label>
+
+        <select id="viewType" name="viewType">
+            <option value="inOut" selected=@(ViewBag.ViewType == "inOut")>In/out</option>
+            <option value="calibration" selected=@(ViewBag.ViewType == "calibration")>Calibration</option>
+        </select>
+    </div>
+
+    <!----
+    <button class="toolbar-btn" id="analyseBtn">
+        //@Html.Partial("Svg/_Analysis")
+        <span>Analyse</span>
+    </button>
+
+    <button class="toolbar-btn" id="addedTag">
+        <span>Added</span>
+    </button>
+
+    <button class="toolbar-btn" id="changedTag">
+        <span>Changed</span>
+    </button>
+
+    <button class="toolbar-btn" id="deletedTag">
+        <span>Deleted</span>
+    </button>-->
+</div>
+
+<div class="file-page-content d-none">
+    <input hidden value="@ViewBag.FileId" id="fileId" />
+    <input hidden value="@ViewBag.ProjectId" id="projectId" />
+    <input hidden value="@ViewBag.SwapView" id="swapView" />
+    <input hidden value="@ViewBag.FullNet" id="fullNet" />
+    <input hidden value="@ViewBag.WWWRoot" id="wwwroot" />
+    <input hidden value="@ViewBag.DisplayParents" id="displayParents" />
+    <input hidden value="@ViewBag.DisplayEquals" id="displayEquals" />
+    <input hidden value="@ViewBag.DisplayChildren" id="displayChildren" />
+    <input hidden value="@ViewBag.DisplayChildLibraries" id="displayChildLibraries" />
+    <input hidden value="@ViewBag.DisplaySubChildren" id="displaySubChildren" />
+    <input hidden value="@ViewBag.RootSysId" id="rootSysId" />
+    <input hidden value="@ViewBag.DisplayTreeView" id="displayTreeView" />
+    <input hidden value="@ViewBag.deletedLineFilesDTO" id="deletedLineFilesDTO" />
+    <input hidden type="text" name="relationshipSearch" id="relationshipSearch" />
+
+
+
+
+    <div class="right-panel small-form-col--45">
+        <div id="subView" style="height: 15rem; border: 1px solid rgba(0, 0, 0, 0.2); margin-bottom: 1rem; position: relative;"></div>
+
+        <form id="signalSearchForm" class="small-form">
+            <div class="row small-form-row">
+                <div class="small-form-col--sm small-form-group small-form-group--left">
+                    <label class="control-label mb-0" for="scope">Scope:</label>
+                </div>
+
+                <div class="small-form-col--lg small-form-group small-form-group--center">
+                    <select id="scope" name="scope" class="form-control">
+                        <option value="inView" selected>In View</option>
+                        <option value="inProject">In Project</option>
+                    </select>
+                </div>
+
+                <div class="small-form-col--md small-form-group small-form-group--right">
+                    <button type="button" id="popUpTrackline" class="btn btn-light main-search-btn form-control" title="Track the Signal">
+                        @Html.Partial("Svg/_TracklineIcon")
+                    </button>
+                </div>
+            </div>
+
+            <div class="row small-form-row">
+                <div class="small-form-col--sm small-form-group small-form-group--left">
+                    <label class="control-label mb-0" for="name">Name:</label>
+                </div>
+
+                <div class="small-form-col--lg small-form-group small-form-group--center">
+                    <input id="name" name="name" class="form-control" />
+                </div>
+
+                <div class="small-form-col--md small-form-group small-form-group--right">
+                    <button disabled type="submit" id="signalSearchBtn" class="btn btn-light main-search-btn form-control" title="Search">
+                        @Html.Partial("Svg/_SearchIcon")
+                    </button>
+                </div>
+
+
+            </div>
+        </form>
+
+        @*@Html.Partial("_SignalTable")*@
+    </div>
+</div>
+
+@section scripts {
+    <script src="~/Scripts/pagination.min.js?v=1.0.10.1"></script>
+    <script src="~/Scripts/d3/d3.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/themes/default/style.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jstree/3.3.16/jstree.min.js"></script>
+    <script type="module" src="~/Scripts/site/analysis/index.js"></script>
+}
+
+<script>
+    function createButton(id, buttonText) {
+        var button = document.createElement("button");
+        button.innerHTML = buttonText;
+        return button;
+    }
+
+    function setLayout() {
+        var content = document.getElementById("navbarSupportedContent");
+        if (content) {
+            content.remove();
+        }
+
+        var navbar = document.getElementsByClassName("navbar");
+        if (navbar) {
+            navbar[0].remove();
+        }
+
+        var mainContainer = document.querySelector(".main-container");
+        if (mainContainer) {
+            mainContainer.style.margin = "0px";
+            mainContainer.style.padding = "0px";
+            mainContainer.style.minWidth = "100%";
+        }
+
+        var mainEle = document.querySelector("main");
+        if (mainEle) {
+            mainEle.classList.remove("pb-3");
+        }
+
+        var footerEle = document.querySelector("body > footer");
+        if (footerEle) {
+            footerEle.setAttribute("style", "position: relative");
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setLayout();
+    });
+
+    function highlightText(element) {
+        element.classList.add("highlighted");
+    }
+
+    function unhighlightText(element) {
+        element.classList.remove("highlighted");
+    }
+
+    function toggleProperties(element) {
+        // TODO: Toggle properties actually, for now just turn visiblity on off
+        let visbilityElement = $('#visibility', element)
+        let visbilityValueElement = $('#visibilityValue', element)
+
+
+        if (visbilityValueElement.html() == 0) {
+            visbilityElement.html('<i class="fas fa-eye"></i>')
+            visbilityValueElement.html(1)
+        }
+        else {
+            visbilityElement.html('<i class="fas fa-eye-slash"></i>')
+            visbilityValueElement.html(0)
+        }
+    }
+
+    let activeCategory = 'deleted';
+
+    function filterByCategory(category) {
+        if (activeCategory == category) {
+            return;
+        }
+
+        const categoryButton = document.getElementById(`${category}Btn`);
+        const previousCategoryButton = document.getElementById(`${activeCategory}Btn`);
+
+        if (previousCategoryButton.classList.contains('active')) {
+            previousCategoryButton.classList.remove('active');
+        }
+
+        if (!categoryButton.classList.contains('active')) {
+            categoryButton.classList.add('active');
+        }
+
+        activeCategory = category;
+
+        const items = document.querySelectorAll(`.${category}`);
+        items.forEach(item => {
+            $(item).show();
+        });
+
+        const allCategories = ['added', 'changed', 'deleted', 'impacted'];
+        allCategories.forEach(toCheckCategory => {
+            if (toCheckCategory != category) {
+                const items2 = document.querySelectorAll(`.${toCheckCategory}`);
+                items2.forEach(item => {
+                    $(item).hide();
+                });
+            }
+        });
+    }
+
+    var isSearching = false; // Flag to track if a search is active
+
+    function fileImpactAnalyse() {
+        $('#file-impact-analyse-btn').toggleClass("active");
+        if ($('#file-impact-analyse-btn').text() === "Show Impact") { $('#file-impact-analyse-btn').text("Hide Impact"); }
+        else {
+            $('#file-impact-analyse-btn').text("Show Impact")
+        }
+    }
+
+    function searchItems() {
+        var searchInput = document.getElementById("searchInput");
+        var searchButton = document.getElementById("searchButton");
+
+        if (!isSearching) {
+            var searchQuery = searchInput.value.toLowerCase();
+
+            // Loop through items and check if they match the search query
+            var allItems = document.querySelectorAll('.highlight-text');
+            for (var i = 0; i < allItems.length; i++) {
+                var item = allItems[i];
+                var itemText = item.textContent.toLowerCase();
+
+                // Check if any of the fields (Name, BlockType, or Id) contain the search query
+                var name = item.querySelector('.highlight-name').textContent.toLowerCase();
+                var blockType = item.querySelector('.highlight-blocktype').textContent.toLowerCase();
+                var id = item.querySelector('.highlight-id').textContent.toLowerCase();
+
+                if (name.includes(searchQuery) || blockType.includes(searchQuery) || id.includes(searchQuery)) {
+                    item.style.display = "block";
+                } else {
+                    item.style.display = "none";
+                }
+            }
+
+            // Update button style and set the search flag
+            searchButton.classList.add("clicked");
+            isSearching = true;
+        } else {
+            // Clear search input and reset button style
+            searchInput.value = "";
+            searchButton.classList.remove("clicked");
+            isSearching = false;
+
+            // Restore visibility of all items
+            var allItems = document.querySelectorAll('.highlight-text');
+            for (var i = 0; i < allItems.length; i++) {
+                allItems[i].style.display = "block";
+            }
+        }
+    }
+
+
+    @using Newtonsoft.Json{
+        var deletedLineFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.deletedLineFilesDTO));
+        var addedLineFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.addedLineFilesDTO));
+        var deletedSystemFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.deletedSystemFilesDTO));
+        var addedSystemFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.addedSystemFilesDTO));
+        var changedSystemFilesDTO = @Html.Raw(JsonConvert.SerializeObject(ViewBag.changedSystemFilesDTO));
+    }
+
+    $(() => {
+    //    $("#changes-list-table").floatThead({
+    //        scrollContainer: () => $('#changes-list-table-wrapper')
+    //    })
+    //    $('#changes-list-table-wrapper').parent().addClass('changes-list-table-thead-wrap')
+       filterByCategory('added')
+    });
+</script>

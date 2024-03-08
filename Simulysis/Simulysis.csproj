@@ -1,0 +1,246 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="compilerconfig.json" />
+    <Content Remove="wwwroot\css\Site\Components\compareTreePartial.cs" />
+    <Content Remove="wwwroot\css\Site\Components\_button.scss" />
+    <Content Remove="wwwroot\css\Site\Layout\_nav-bar.scss" />
+    <Content Remove="wwwroot\images\_analysis.svg" />
+
+    <Content Remove="wwwroot\scripts\site\api\compareProject.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\scripts\site\api\compareProject.js" />
+
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="30.0.1" />
+    <PackageReference Include="EPPlus" Version="6.2.8" />
+    <PackageReference Include="ExcelPackage" Version="1.0.0" />
+    <PackageReference Include="LibGit2Sharp" Version="0.27.2" />
+    <PackageReference Include="LibGit2Sharp.NativeBinaries" Version="2.0.320" />
+    <PackageReference Include="log4net" Version="2.0.15" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="7.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.15" />
+    <PackageReference Include="MySql.Data" Version="8.0.33" />
+    <PackageReference Include="MySqlConnector" Version="2.2.6" />
+    <PackageReference Include="Octokit" Version="7.0.1" />
+    <PackageReference Include="OfficeOpenXml.Core.ExcelPackage" Version="1.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="WebCompiler" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\DAO\DAO.csproj" />
+    <ProjectReference Include="..\Entities\Entities.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\css\Base\" />
+    <Folder Include="wwwroot\css\Layout\" />
+    <Folder Include="wwwroot\Scripts\site\draw\folderTree\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="compilerconfig.json" />
+    <None Include="wwwroot\images\_analysis.svg" />
+    <None Include="wwwroot\Scripts\app\app.datamodel.js" />
+    <None Include="wwwroot\Scripts\app\app.viewmodel.js" />
+    <None Include="wwwroot\Scripts\app\common.js" />
+    <None Include="wwwroot\Scripts\app\home.viewmodel.js" />
+    <None Include="wwwroot\Scripts\app\_run.js" />
+    <None Include="wwwroot\Scripts\bootstrap.bundle.js" />
+    <None Include="wwwroot\Scripts\bootstrap.bundle.js.map" />
+    <None Include="wwwroot\Scripts\bootstrap.bundle.min.js" />
+    <None Include="wwwroot\Scripts\bootstrap.bundle.min.js.map" />
+    <None Include="wwwroot\Scripts\bootstrap.js" />
+    <None Include="wwwroot\Scripts\bootstrap.js.map" />
+    <None Include="wwwroot\Scripts\bootstrap.min.js" />
+    <None Include="wwwroot\Scripts\bootstrap.min.js.map" />
+    <None Include="wwwroot\Scripts\d3\API.md" />
+    <None Include="wwwroot\Scripts\d3\CHANGES.md" />
+    <None Include="wwwroot\Scripts\d3\d3.js" />
+    <None Include="wwwroot\Scripts\d3\d3.min.js" />
+    <None Include="wwwroot\Scripts\d3\LICENSE" />
+    <None Include="wwwroot\Scripts\d3\README.md" />
+    <None Include="wwwroot\Scripts\esm\popper-utils.js" />
+    <None Include="wwwroot\Scripts\esm\popper-utils.js.map" />
+    <None Include="wwwroot\Scripts\esm\popper-utils.min.js" />
+    <None Include="wwwroot\Scripts\esm\popper-utils.min.js.map" />
+    <None Include="wwwroot\Scripts\esm\popper.js" />
+    <None Include="wwwroot\Scripts\esm\popper.js.map" />
+    <None Include="wwwroot\Scripts\esm\popper.min.js" />
+    <None Include="wwwroot\Scripts\esm\popper.min.js.map" />
+    <None Include="wwwroot\Scripts\index.d.ts" />
+    <None Include="wwwroot\Scripts\index.js.flow" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.intellisense.js" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.js" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.min.js" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.min.map" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.slim.js" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.slim.min.js" />
+    <None Include="wwwroot\Scripts\jquery-3.4.1.slim.min.map" />
+    <None Include="wwwroot\Scripts\knockout-3.5.0.debug.js" />
+    <None Include="wwwroot\Scripts\knockout-3.5.0.js" />
+    <None Include="wwwroot\Scripts\knockout.validation.js" />
+    <None Include="wwwroot\Scripts\knockout.validation.min.js" />
+    <None Include="wwwroot\Scripts\knockout.validation.min.js.map" />
+    <None Include="wwwroot\Scripts\modernizr-2.8.3.js" />
+    <None Include="wwwroot\Scripts\pagination.min.js" />
+    <None Include="wwwroot\Scripts\popper-utils.js" />
+    <None Include="wwwroot\Scripts\popper-utils.js.map" />
+    <None Include="wwwroot\Scripts\popper-utils.min.js" />
+    <None Include="wwwroot\Scripts\popper-utils.min.js.map" />
+    <None Include="wwwroot\Scripts\popper.js" />
+    <None Include="wwwroot\Scripts\popper.js.map" />
+    <None Include="wwwroot\Scripts\popper.min.js" />
+    <None Include="wwwroot\Scripts\popper.min.js.map" />
+    <None Include="wwwroot\Scripts\README.md" />
+    <None Include="wwwroot\Scripts\sammy-0.7.5.js" />
+    <None Include="wwwroot\Scripts\sammy-0.7.5.min.js" />
+    <None Include="wwwroot\scripts\site\api\compareProject.js" />
+    <None Include="wwwroot\Scripts\site\api\config.js" />
+    <None Include="wwwroot\Scripts\site\api\fileContents.js" />
+    <None Include="wwwroot\Scripts\site\api\fileRelationships.js" />
+    <None Include="wwwroot\Scripts\site\api\files.js" />
+    <None Include="wwwroot\Scripts\site\api\log.js" />
+    <None Include="wwwroot\Scripts\site\api\search.js" />
+    <None Include="wwwroot\Scripts\site\draw\index.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\common.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\line.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\markers.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\clock.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\combinatorialLogic.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\constant.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\from.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\gain.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\goto.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\ground.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\index.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\logic.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\modelReference.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\mux.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\port.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\reference.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\relationalOperator.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\scope.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\sin.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\subSystem.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\sum.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\terminator.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\toWorkspace.js" />
+    <None Include="wwwroot\Scripts\site\draw\model\index.js" />
+    <None Include="wwwroot\Scripts\site\draw\network\draw-entities\fileRect.js" />
+    <None Include="wwwroot\Scripts\site\draw\network\draw-entities\functionGroup.js" />
+    <None Include="wwwroot\Scripts\site\draw\network\index.js" />
+    <None Include="wwwroot\Scripts\site\loader.js" />
+    <None Include="wwwroot\Scripts\site\noop.js" />
+    <None Include="wwwroot\Scripts\site\pages\network-extend\index.js" />
+    <None Include="wwwroot\Scripts\site\pages\network-extend\signalTable.js" />
+    <None Include="wwwroot\Scripts\site\pages\show-file\index.js" />
+    <None Include="wwwroot\Scripts\site\pages\show-file\search.js" />
+    <None Include="wwwroot\Scripts\site\pages\show-file\viewManager.js" />
+    <None Include="wwwroot\Scripts\site\pages\trackline\index.js" />
+    <None Include="wwwroot\Scripts\site\pages\trackline\tracklineViewManager.js" />
+    <None Include="wwwroot\Scripts\site\pagination.js" />
+    <None Include="wwwroot\Scripts\site\readme.md" />
+    <None Include="wwwroot\Scripts\site\treeview.js" />
+    <None Include="wwwroot\Scripts\site\utils\errorLogger.js" />
+    <None Include="wwwroot\Scripts\site\utils\file.js" />
+    <None Include="wwwroot\Scripts\site\utils\fileRelationships.js" />
+    <None Include="wwwroot\Scripts\site\utils\popUp.js" />
+    <None Include="wwwroot\Scripts\site\utils\system.js" />
+    <None Include="wwwroot\Scripts\site\utils\systemLevel.js" />
+    <None Include="wwwroot\Scripts\src\index.js" />
+    <None Include="wwwroot\Scripts\src\methods\defaults.js" />
+    <None Include="wwwroot\Scripts\src\methods\destroy.js" />
+    <None Include="wwwroot\Scripts\src\methods\disableEventListeners.js" />
+    <None Include="wwwroot\Scripts\src\methods\enableEventListeners.js" />
+    <None Include="wwwroot\Scripts\src\methods\placements.js" />
+    <None Include="wwwroot\Scripts\src\methods\update.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\applyStyle.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\arrow.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\computeStyle.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\flip.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\hide.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\index.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\inner.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\keepTogether.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\offset.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\preventOverflow.js" />
+    <None Include="wwwroot\Scripts\src\modifiers\shift.js" />
+    <None Include="wwwroot\Scripts\src\utils\clockwise.js" />
+    <None Include="wwwroot\Scripts\src\utils\computeAutoPlacement.js" />
+    <None Include="wwwroot\Scripts\src\utils\debounce.js" />
+    <None Include="wwwroot\Scripts\src\utils\find.js" />
+    <None Include="wwwroot\Scripts\src\utils\findCommonOffsetParent.js" />
+    <None Include="wwwroot\Scripts\src\utils\findIndex.js" />
+    <None Include="wwwroot\Scripts\src\utils\getBordersSize.js" />
+    <None Include="wwwroot\Scripts\src\utils\getBoundaries.js" />
+    <None Include="wwwroot\Scripts\src\utils\getBoundingClientRect.js" />
+    <None Include="wwwroot\Scripts\src\utils\getClientRect.js" />
+    <None Include="wwwroot\Scripts\src\utils\getFixedPositionOffsetParent.js" />
+    <None Include="wwwroot\Scripts\src\utils\getOffsetParent.js" />
+    <None Include="wwwroot\Scripts\src\utils\getOffsetRect.js" />
+    <None Include="wwwroot\Scripts\src\utils\getOffsetRectRelativeToArbitraryNode.js" />
+    <None Include="wwwroot\Scripts\src\utils\getOppositePlacement.js" />
+    <None Include="wwwroot\Scripts\src\utils\getOppositeVariation.js" />
+    <None Include="wwwroot\Scripts\src\utils\getOuterSizes.js" />
+    <None Include="wwwroot\Scripts\src\utils\getParentNode.js" />
+    <None Include="wwwroot\Scripts\src\utils\getPopperOffsets.js" />
+    <None Include="wwwroot\Scripts\src\utils\getReferenceNode.js" />
+    <None Include="wwwroot\Scripts\src\utils\getReferenceOffsets.js" />
+    <None Include="wwwroot\Scripts\src\utils\getRoot.js" />
+    <None Include="wwwroot\Scripts\src\utils\getRoundedOffsets.js" />
+    <None Include="wwwroot\Scripts\src\utils\getScroll.js" />
+    <None Include="wwwroot\Scripts\src\utils\getScrollParent.js" />
+    <None Include="wwwroot\Scripts\src\utils\getStyleComputedProperty.js" />
+    <None Include="wwwroot\Scripts\src\utils\getSupportedPropertyName.js" />
+    <None Include="wwwroot\Scripts\src\utils\getViewportOffsetRectRelativeToArtbitraryNode.js" />
+    <None Include="wwwroot\Scripts\src\utils\getWindow.js" />
+    <None Include="wwwroot\Scripts\src\utils\getWindowSizes.js" />
+    <None Include="wwwroot\Scripts\src\utils\includeScroll.js" />
+    <None Include="wwwroot\Scripts\src\utils\index.js" />
+    <None Include="wwwroot\Scripts\src\utils\isBrowser.js" />
+    <None Include="wwwroot\Scripts\src\utils\isFixed.js" />
+    <None Include="wwwroot\Scripts\src\utils\isFunction.js" />
+    <None Include="wwwroot\Scripts\src\utils\isIE.js" />
+    <None Include="wwwroot\Scripts\src\utils\isModifierEnabled.js" />
+    <None Include="wwwroot\Scripts\src\utils\isModifierRequired.js" />
+    <None Include="wwwroot\Scripts\src\utils\isNumeric.js" />
+    <None Include="wwwroot\Scripts\src\utils\isOffsetContainer.js" />
+    <None Include="wwwroot\Scripts\src\utils\removeEventListeners.js" />
+    <None Include="wwwroot\Scripts\src\utils\runModifiers.js" />
+    <None Include="wwwroot\Scripts\src\utils\setAttributes.js" />
+    <None Include="wwwroot\Scripts\src\utils\setStyles.js" />
+    <None Include="wwwroot\Scripts\src\utils\setupEventListeners.js" />
+    <None Include="wwwroot\Scripts\umd\popper-utils.js" />
+    <None Include="wwwroot\Scripts\umd\popper-utils.js.map" />
+    <None Include="wwwroot\Scripts\umd\popper-utils.min.js" />
+    <None Include="wwwroot\Scripts\umd\popper-utils.min.js.map" />
+    <None Include="wwwroot\Scripts\umd\popper.js" />
+    <None Include="wwwroot\Scripts\umd\popper.js.flow" />
+    <None Include="wwwroot\Scripts\umd\popper.js.map" />
+    <None Include="wwwroot\Scripts\umd\popper.min.js" />
+    <None Include="wwwroot\Scripts\umd\popper.min.js.map" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

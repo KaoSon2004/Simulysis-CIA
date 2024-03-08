@@ -1,0 +1,98 @@
+﻿@model Simulysis.Models.NewFileView
+@{
+    ViewBag.Title = "New file";
+    ViewBag.ActiveTab = ViewBag.ProjectName;
+}
+
+<div class="modal fade" id="upload-loader" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="upload-loader-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="upload-loader-label">Uploading...</h5>
+            </div>
+            <div class="modal-body">
+                Please wait. Your file is being uploaded.
+                <div class="progress mt-2">
+                    <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toolbar">
+    <a href="@Url.Action("Index", "Files", new { projectId = Convert.ToInt64(ViewContext.RouteData.Values["projectId"]) })" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_JumpBackIcon.cshtml")
+        Back
+    </a>
+
+    <button type="submit" form="file-upload-form" class="toolbar-btn">
+        @Html.Partial("~/Views/Shared/Svg/_SaveIcon.cshtml")
+        <span>
+            Save
+        </span>
+    </button>
+</div>
+
+@if (ViewBag.Status != null && Convert.ToBoolean(ViewBag.Status))
+{
+    if (ViewBag.Message != null)
+    {
+        <div class="alert alert-success mt-2">
+            <strong>Success!</strong> @ViewBag.Message
+        </div>
+    }
+}
+else
+{
+    using (Html.BeginForm("New", "Files", FormMethod.Post, new { enctype = "multipart/form-data", id = "file-upload-form", @class = "custom-form" }))
+    {
+        @Html.AntiForgeryToken()
+
+        if (ViewBag.Message != null)
+        {
+            <div class="alert alert-danger form-error-msg mb-4">
+                <strong>Error!</strong> @ViewBag.Message
+            </div>
+        }
+
+        <div class="form-group row no-gutters">
+            @Html.LabelFor(m => m.File, htmlAttributes: new { @class = "control-label col-12 col-sm-4 col-lg-3 custom-form-required" })
+            <div class="col-12 col-sm-8 col-lg-9">
+                @Html.TextBoxFor(m => m.File, null, new { type = "file", @class = "form-control-file" })
+                @Html.ValidationMessageFor(model => model.File, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+     
+        <div class="form-group row no-gutters">
+            @Html.LabelFor(m => m.Description, htmlAttributes: new { @class = "control-label col-12 col-sm-4 col-lg-3" })
+            <div class="col-12 col-sm-8 col-lg-9">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", rows = 5 })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="alert alert-success" role="alert">
+            <h6 class="alert-heading font-weight-bold">Note</h6>
+            <p>
+                To use this function, you must upload the file ".mdl" or ".xml" file stored on your computer.
+                After that, click "Save".
+            </p>
+        </div>
+    }
+}
+
+
+<script>
+    document.querySelector('#file-upload-form').addEventListener('submit', function handleUpload(e) {
+        e.preventDefault()
+
+        $('.field-validation-error.text-danger').empty()
+        $('.form-error-msg').hide()
+
+        $('#upload-loader').modal('show')
+
+        $('#file-upload-form').submit()
+    })
+</script>

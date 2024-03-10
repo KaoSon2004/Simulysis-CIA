@@ -9,6 +9,12 @@ var Tracer = {
 	state: {},
 	modelDraw: {},
 	levelClickContents: {},
+	
+	/*
+	* Properties
+	*/
+	
+	map: {},
 	/*
 	* Methods
 	*/
@@ -16,7 +22,7 @@ var Tracer = {
 		this.state = state;
 		this.modelDraw = modelDraw;
 		this.levelClickContents = levelClickContents;
-		
+		this.map = {};
 	},
 	async TrackLineLoop(reversedDirection) {
 		if (this.state.isEmptyStack()) {
@@ -25,90 +31,103 @@ var Tracer = {
 		}
 		var obj = this.state.removeStack();
 
-
 		if (obj.type == 'system') {
+			if (!this.state.checkIfFoundBlocks(obj)) {
 
-			var s = obj;
-			var blockTypeOutGF = reversedDirection ? 'From' : 'Goto'
-			let neBlockTypeOutGF = reversedDirection ? 'Goto' : 'From'
-			if (s.blockType == blockTypeOutGF) {
-				this.highlightGoto(s, s.props.GotoTag, s.systemDraws, s.lineDraws, s.branchDrawsLevel, reversedDirection)
-			} else if (s.blockType == neBlockTypeOutGF) {
-				if (s.rootObj && !Array.isArray(s.rootObj))
-				{
-					this.state.onNewSystemFound(s, s.rootObj)
+				var s = obj;
+				var blockTypeOutGF = reversedDirection ? 'From' : 'Goto'
+				this.state.onNewBlockFound(s, false);
+				if (s.blockType == blockTypeOutGF) {
+					this.highlightGoto(s, s.props.GotoTag, s.systemDraws, s.lineDraws, s.branchDrawsLevel, reversedDirection)
 				}
-			}
+				/*
+				* process outport block
+				* cache outport result
+				*/
+				var blockType = reversedDirection ? 'Inport' : 'Outport'
+				if (s.blockType == blockType) {
+					var parentSystem = s.getParentSystem();
+					if (parentSystem != null) {
+						var lineResult = this.state.findLineByPort(s, parentSystem.lineDraws, reversedDirection, parentSystem);
+						this.processPortResult(lineResult,parentSystem);
 
-			var blockType = reversedDirection ? 'Inport' : 'Outport'
-			if (s.blockType == blockType) {
-				var parentSystem = s.getParentSystem();
-				if (parentSystem != null) {
-					const port = Number(s.props.Port ?? 1);
-					parentSystem.addOutport(s)
-					var type = reversedDirection ? 'dst' : 'src'
-					var portType = type + 'Port'
-					var lineResult = this.state.findLineByPort(parentSystem.lineDraws, type, portType, port, parentSystem);
-					this.processPortResult(lineResult, s, parentSystem);
-
-					if (reversedDirection) {
-						var branchResult = this.state.findBranchByPort(parentSystem.branchDrawsLevel, type, portType, port, parentSystem);
-						this.processPortResult(branchResult, s, parentSystem)
+						if (reversedDirection) {
+							var branchResult = this.state.findBranchByPort(s, parentSystem.branchDrawsLevel, reversedDirection, parentSystem);
+							this.processPortResult(branchResult, parentSystem)
+						}
 					}
+					/*this.handleInOutPort(s, reversedDirection);*/
 				}
-				/*this.handleInOutPort(s, reversedDirection);*/
-			} 
 
-			else {
-				if (s.loop == false && s.blockType != blockTypeOutGF) {
-					var lineResults = this.state.findLineResult(s, s.systemDraws, s.lineDraws, s.branchDrawsLevel, reversedDirection)
+				else {
+					if (s.blockType != blockTypeOutGF) {
+						var lineResults = this.state.findLineResult(s, s.systemDraws, s.lineDraws, s.branchDrawsLevel, reversedDirection)
 
-					// If searching in reserverd direction, node nexts to
-					// a system mayble a branch
+						// If searching in reserverd direction, node nexts to
+						// a system mayble a branch
 
-					if (reversedDirection) {
-						//if prev of block has both branches and lines,
-						// trace level of branch must plus length of lineResult
-						// to avoid overlapping
-						var plusTraceLevel = lineResults.length;
-						var branchResults = this.state.findBranchResult(s, s.systemDraws, s.lineDraws, s.branchDrawsLevel, reversedDirection, plusTraceLevel)
+						if (reversedDirection) {
 
-						branchResults.forEach(branchResult => {
-							if (!this.state.checkIfFoundBranches(branchResult)) {
-								this.state.onNewSystemFound(branchResult, s);
-								this.state.addStack(branchResult);
-							}
+							var branchResults = this.state.findBranchResult(s, s.systemDraws, s.lineDraws, s.branchDrawsLevel, reversedDirection);
+
+							branchResults?.forEach(branchResult => {
+								if (!this.state.checkIfFoundBranches(branchResult)) {
+									this.state.addStack(branchResult);
+								}
+							})
+						}
+
+
+						lineResults.forEach(lineResult => {
+							this.state.addStack(lineResult);
 						})
 					}
-
-					lineResults.forEach(lineResult => {
-						this.state.onNewSystemFound(lineResult, s);
-						this.state.addStack(lineResult);
-					})
 				}
+				this.state.foundBlocks.push(s);
+			}
+			else {
+
+				this.processLoopObj(obj, reversedDirection);
 			}
 
-			this.state.foundBlocks.push(s);
 
 
 		}
 
 		if (obj.type == 'line') {
-			var lineResult = obj;
-			this.state.foundLines.push(lineResult);
-			///if searching in direct direction find prev system and connect 2 nodes on grapj
-			if (!reversedDirection) {
-				if (lineResult.rootObj) {
-					this.state.onNewSystemFound(lineResult, lineResult.rootObj)
-				}
 
-				if (lineResult.branchDraws.length != 0) {
-					this.highlightBranches(lineResult, lineResult.branchDraws, lineResult.systemDraws, lineResult.lineDraws)
-				} else {
+			if (!this.state.checkIfFoundLines(obj)) {
+				var lineResult = obj;
+				this.state.onNewBlockFound(lineResult)
+				///if searching in direct direction find prev system and connect 2 nodes on grapj
+				if (!reversedDirection) {
+
+					if (lineResult.branchDraws.length != 0) {
+						this.highlightBranches(lineResult, lineResult.branchDraws, lineResult.systemDraws, lineResult.lineDraws)
+					} else {
+
+
+						var s = this.state.findSystem(lineResult, lineResult.systemDraws, lineResult.lineDraws, lineResult.branchDrawsLevel, reversedDirection)
+						if (s) {
+							var newS = s;
+							if (SystemUtil.isRefToFile(newS.blockType, newS.sourceFile) && newS.sourceFile != '') {
+								await this.handleModelReference(newS, obj, reversedDirection,)
+							}
+
+							else if (newS.blockType == 'SubSystem') {
+								await this.handleSubsystem(newS, obj, reversedDirection, obj.getResponse(),)
+							}
+							else {
+								this.state.addStack(newS);
+							}
+						}
+					}
+
+				}
+				else {
 					var s = this.state.findSystem(lineResult, lineResult.systemDraws, lineResult.lineDraws, lineResult.branchDrawsLevel, reversedDirection)
-					if (s) {
-						var newS = Object.create(s);
-						this.state.onNewSystemFound(newS, lineResult);
+					var newS = s;
+					if (newS) {
 						if (SystemUtil.isRefToFile(newS.blockType, newS.sourceFile) && newS.sourceFile != '') {
 							await this.handleModelReference(newS, obj, reversedDirection,)
 						}
@@ -120,82 +139,63 @@ var Tracer = {
 						}
 					}
 				}
-
+				this.state.foundLines.push(lineResult)
 			}
-
-
 			else {
-				var s = this.state.findSystem(lineResult, lineResult.systemDraws, lineResult.lineDraws, lineResult.branchDrawsLevel, reversedDirection)
-				if (s) {
-					var newS = Object.create(s);
-					this.state.onNewSystemFound(newS, lineResult);
-					if (SystemUtil.isRefToFile(newS.blockType, newS.sourceFile) && newS.sourceFile != '') {
-						await this.handleModelReference(newS, obj, reversedDirection,)
-					}
-					else if (newS.blockType == 'SubSystem') {
-						await this.handleSubsystem(newS, obj, reversedDirection, obj.getResponse(),)
-					}
-					else {
-						this.state.addStack(newS);
-					}
-				}
+				this.processLoopObj(obj, reversedDirection);
 			}
-
 		}
 		if (obj.type == 'branch') {
+			if (!this.state.checkIfFoundBranches(obj)) {
+				var branch = obj;
 
-			var branch = obj;
-			
+				this.state.onNewBlockFound(branch)
+				if (!reversedDirection) {
 
-			this.state.onNewSystemFound(branch, branch.rootObj)
-			if (!reversedDirection) {
 
-				if (branch.loop == false) {
-
-					if (!reversedDirection && branch.branchDraws.length != 0) {
+					if (branch.branchDraws.length != 0) {
 						this.highlightBranches(branch, branch.branchDraws, branch.systemDraws, branch.lineDraws)
 					} else {
 						var s = this.state.findSystem(branch, branch.systemDraws, branch.lineDraws, branch.branchDrawsLevel, reversedDirection)
+
 						if (s) {
-							var newS = Object.create(s)
-							this.state.onNewSystemFound(newS, branch);
-							if (SystemUtil.isRefToFile(newS.blockType, newS.sourceFile) && newS.sourceFile != "") {
+							var newS = s;
+							if (SystemUtil.isRefToFile(newS.blockType, newS.sourceFile) && newS.sourceFile != '') {
 								await this.handleModelReference(newS, obj, reversedDirection,)
 							}
 							else if (newS.blockType == 'SubSystem') {
 								await this.handleSubsystem(newS, obj, reversedDirection, obj.getResponse(),)
-							} else {
+							}
+							else {
 								this.state.addStack(newS);
 							}
 						}
 					}
 
 				}
-			} else {
-				var branchResult = this.state.findBranchFromBranch(branch, branch.systemDraws, branch.lineDraws, branch.branchDrawsLevel);
-				if (branchResult) {
-					if (branchResult.loop == false) {
-						this.state.onNewSystemFound(branchResult, obj);
+				else {
+					var branchResult = this.state.findBranchFromBranch(branch, branch.systemDraws, branch.lineDraws, branch.branchDrawsLevel);
+					if (branchResult) {
 						this.state.addStack(branchResult);
 					}
-					branchResult.loop = true;
-				}
-
-				var lineResult = this.state.findLineFromBranch(branch, branch.systemDraws, branch.lineDraws, branch.branchDrawsLevel);
-				if (lineResult)
-				{
-					this.state.onNewSystemFound(lineResult, obj);
+					var lineResult = this.state.findLineFromBranch(branch, branch.systemDraws, branch.lineDraws, branch.branchDrawsLevel);
 					this.state.addStack(lineResult);
 				}
+
+
+				this.state.foundBranches.push(branch);
+			} else {
+				this.processLoopObj(obj, reversedDirection);
 			}
-			this.state.foundBranches.push(branch);
 
 		}
-		this.state.onSystemTraceDone(obj);
+		//this.state.highlightCurrentObj(obj);
 
 		setTimeout(async () => {
 			await this.TrackLineLoop(reversedDirection);
 		}, 0)
+
+
 	},
 
 	highlightGoto(system, input, systems, lines, branches, reversedDirection) {
@@ -205,102 +205,68 @@ var Tracer = {
 		var ses = systems.filter(system => {
 			return system.props.GotoTag == input && system.blockType == blockTypeGF
 		})
-		var num = ses.length;
 
 		for (let s of ses) {
-
 			s = this.state.spreadInfor(
-				s, systems, lines, branches, system	);
-
-			if (this.state.checkIfFoundBlocks(s)) {
-				s.loop = true;
-				const newSys = this.createNewObj(s, system, system.getCurrentTraceLevel() + num)
-				num--;
-				this.state.addStack(newSys);
-				continue;
-			}
-			const newSys = this.createNewObj(s, system, system.getCurrentTraceLevel() + num)
-			num--;
-
+				s, systems, lines, branches, system
+			);
+			const newSys = this.createNewObj(s, system)
 			this.state.addStack(newSys);
 		}
 
 	},
 	highlightBranches(lineResult, branches, systems, lines) {
-		var num = branches.length;
 		for (let branch of branches) {
-			branch = this.state.spreadInfor(branch, systems, lines, undefined, lineResult
+			branch = this.state.spreadInfor(
+				branch, systems, lines, undefined, lineResult
 			)
-			if (this.state.checkIfFoundBranches(branch)) {
-				branch.loop = true;
-				const newBranch = this.createNewObj(branch, lineResult, lineResult.getCurrentTraceLevel() + num);
-				num--;
-				this.state.addStack(newBranch);
-				continue;
-			}
 
-			const newBranch = this.createNewObj(branch, lineResult, lineResult.getCurrentTraceLevel() + num);
-			num--;
+
+			const newBranch = this.createNewObj(branch, lineResult);
 			this.state.addStack(newBranch);
 		}
+
 
 	},
 
 
-	processPortResult(result, systemPort, parentSystem) {
-		const { cx: rootCx, cy: rootCy } = parentSystem.treeCoordinate;
+	processPortResult(result,parentSystem) {
 
 		if (result) {
 			result = this.state.spreadInfor(
 				result, parentSystem.systemDraws, parentSystem.lineDraws
 				, parentSystem.branchDrawsLevel, parentSystem
+
 			)
-			if (parentSystem.name == 'acc_control') {
-				console.log(result);
-			}
-			var newResult = Object.create(result);
-			newResult.systemPort = systemPort;
-			newResult.setCurrentTraceLevel(parentSystem.getCurrentTraceLevel() + 1);
+			var newResult = result;
 			//root obj of lineresult connected to port is subsystem/modelRef
 			newResult.rootObj = parentSystem;
+			newResult.fromLine = parentSystem.lineInSubsys;
+
+			newResult.addToRootObjArr(parentSystem);
+
+			this.state.onNewBlockFound(newResult);
 			this.state.addStack(newResult);
-			this.state.onNewSystemFound(newResult, parentSystem);
 		}
-	},
-
-	handleInOutPort(obj, reversedDirection) {
-		var depth = obj.getCurrentDeepLevel();
-		if (depth <= 0) return;
-		if (depth == undefined) return;
-		var type = !reversedDirection ? 'src' : 'dst'
-		var { lines, systems, sysId } = this.levelClickContents[`level${depth - 1}`]
-		var lineResult = lines.find(line => {
-			return line[type + "Port"] == Number(obj.props.Port ?? 1) && line[type].id == sysId;
-		})
-		var branches;
-		if (reversedDirection) {
-			branches = LineUtil.getAllBranch(lines, []);
-		}
-
-		const { cx: rootCx, cy: rootCy } = obj.treeCoordinate;
-		lineResult.root = obj
-		lineResult = this.state.spreadInfor(
-			lineResult, systems, lines, branches
-			, undefined, undefined, depth - 1
-		)
-
-		lineResult.setCurrentTraceLevel(obj.getCurrentTraceLevel() - 1);
-		this.state.addStack(lineResult)
-
-
 	},
 
 	async handleModelReference(s, obj, reversedDirection) {
-		//s.needHighLight && this.state.highlight(s);
+
+		s.lineInSubsys = obj;
+		s.needHighLight && this.state.highlight(s);
 		s.__proto__.__proto__.setIsTrackLine(true);
-		this.state.cpyStack.push(s);
+		this.state.onNewBlockFound(s);
 		this.state.foundBlocks.push(s);
-		var { newSystems, newLines, response } = await this.state.fetchingFileContent(s);
+
+		const keyVal = `${s.name}${s.stringId}`;
+		if (!this.map[keyVal]) {
+			var { newSystems, newLines, response } = await this.state.fetchingFileContent(s);
+			this.map[keyVal] = { newSystems, newLines };
+		} else {
+			var { newSystems, newLines } = this.map[keyVal];
+		}
+
+
 
 		var sIn = this.state.findSystemByPort(newSystems, obj, reversedDirection)
 		if (!sIn) return;
@@ -308,18 +274,10 @@ var Tracer = {
 			var newBranchDraws = LineUtil.getAllBranch(newLines, []);
 		}
 
-		/*		s = this.state.spreadInfor(
-			s, systems, lines, branches
-			, system.getParentSystem()
-			, system.getResponse()
-			, system.getCurrentDeepLevel()
-			, system.getTraceDeepLevel()
-			, system.getFileContent()
-			, system.getRootSysId()
-		);*/
-
 		sIn.initListObjDraws(newSystems, newLines, newBranchDraws);
 		sIn.setParentSystem(s);
+
+		sIn.rootObj = null
 
 		sIn.initResponse(response);
 		sIn.setCurrentDeepLevel(undefined);
@@ -327,81 +285,130 @@ var Tracer = {
 		sIn.setFileContent(response)
 		sIn.setRootSysId(0);
 
-		sIn?.setCurrentTraceLevel(s.getCurrentTraceLevel() + 1);
-		
-		if (!this.state.checkIfFoundBlocks(sIn)) {
-			this.state.addStack(sIn)
-		} else {
-			this.state.removeStack();
-		}
-
-		s.systemIn = sIn;
-		this.state.onNewSystemFound(sIn, s);
+		this.state.addStack(sIn)
 
 	},
 	async handleSubsystem(s, obj, reversedDirection, response) {
-		this.state.cpyStack.push(s);
-		//s.needHighLight && this.state.highlight(s);
+
+		s.lineInSubsys = obj;
+
+		s.needHighLight && this.state.highlight(s);
 		s.__proto__.__proto__.setIsTrackLine(true);
-		
+		this.state.onNewBlockFound(s);
 		this.state.foundBlocks.push(s);
+
 		var fileContent = response != null ? response : this.modelDraw.fileContent;
-		var { newSystems, newLines } = this.state.fetchingDrawEntities(
-			fileContent,
-			s.id
-		)
+		const keyVal = `${s.name}${s.stringId}`;
+		if (!this.map[keyVal]) {
+			var { systemDraws: newSystems, lineDraws: newLines } = this.modelDraw.initDrawEntities(
+				false,
+				fileContent,
+				s.id
+			)
+			this.map[keyVal] = { newSystems, newLines };
+		} else {
+			var { newSystems, newLines } = this.map[keyVal];
+		}
+
+
 
 		var type = reversedDirection ? 'srcPort' : 'dstPort'
 		if (obj[type] == "enable") {
-			var enableSys = newSystems.	find(system => {
+			var enableSys = newSystems.find(system => {
 				return system.blockType == 'EnablePort';
 			})
-			//enableSys.needHighLight && this.state.highlight(enableSys);
-			if (enableSys) {
-				this.state.foundBlocks.push(enableSys);
-				enableSys.setCurrentTraceLevel(s.getCurrentTraceLevel() + 1);
-				this.state.onNewSystemFound(enableSys, s);
-				this.state.addStack(enableSys);
-			}
+
+			enableSys.rootObj = null
+
+			enableSys.needHighLight && this.state.highlight(enableSys);
+			this.state.foundBlocks.push(enableSys);
+			this.state.addStack(enableSys);
 			return;
 		}
 		var sIn = this.state.findSystemByPort(newSystems, obj, reversedDirection)
 		if (!sIn) {
 			return;
 		}
+
 		if (reversedDirection) {
 			var newBranchDraws = LineUtil.getAllBranch(newLines, []);
 		}
-
 		sIn.initListObjDraws(newSystems, newLines, newBranchDraws);
 		sIn.setParentSystem(s);
+
+		sIn.rootObj = null
 
 		sIn.initResponse(response);
 		sIn.setCurrentDeepLevel(undefined);
 		sIn.setTraceDeepLevel(s.getTraceDeepLevel() + 1);
-		sIn.setFileContent(fileContent)
-		sIn.setRootSysId(s.id);
-
-
-		this.state.onNewSystemFound(sIn, s);
-
-		if (!this.state.checkIfFoundBlocks(sIn)) {
-			this.state.addStack(sIn)
-		} else {
-			this.state.removeStack();
-		}
+		sIn.setFileContent(response)
+		sIn.setRootSysId(0);
+		this.state.addStack(sIn)
 	},
-	createNewObj(obj, rootObj, currentTraceLevel) {
 
-		const newObj = Object.create(obj);
+	createNewObj(obj, rootObj) {
+		var newObj = obj;
+
 		newObj.rootObj = rootObj;
-		newObj.setCurrentTraceLevel(currentTraceLevel);
-
-		this.state.onNewSystemFound(obj, rootObj);
-
+		newObj.addToRootObjArr(rootObj);
 		return newObj;
 	},
 
+	findPortResult(obj, reversedDirection) {
+		var parentSystem = obj.getParentSystem();
+		if (parentSystem != null) {
+
+			var lineResult = this.state.findLineByPort(obj, parentSystem.lineDraws, reversedDirection, parentSystem);
+			this.processPortResult(lineResult, parentSystem);
+
+			if (reversedDirection) {
+				var branchResult = this.state.findBranchByPort(obj, parentSystem.branchDrawsLevel, reversedDirection, parentSystem);
+				this.processPortResult(branchResult, parentSystem)
+			}
+		}
+	},
+	processLoopObj(obj, reversedDirection) {
+
+
+		var loopObj = null;
+		if (obj.type == 'system') {
+			loopObj = this.state.foundBlocks.find(el => el.stringId == obj.stringId && el.getTraceDeepLevel() == obj.getTraceDeepLevel())
+		}
+		if (obj.type == 'line') {
+
+			loopObj = this.state.foundLines.find(
+				el => el.stringId == obj.stringId
+					&& el.getTraceDeepLevel() == obj.getTraceDeepLevel()
+			)
+
+
+		}
+
+		if (obj.type == 'branch') {
+			loopObj = this.state.foundBranches.find(
+				el => el.stringId == obj.stringId
+					&& el.getTraceDeepLevel() == obj.getTraceDeepLevel()
+			)
+		}
+
+		this.state.onNewBlockFound(obj, true);
+		const parentSystem = obj.getParentSystem();
+
+		if (parentSystem) {
+
+			loopObj.outports.forEach(outport => {
+				var lineResult = this.state.findLineByPortNumber(outport, parentSystem.lineDraws, reversedDirection, parentSystem);
+				this.processPortResult(lineResult, parentSystem);
+
+				if (reversedDirection) {
+
+					var branchResult = this.state.findBranchByPort(obj, parentSystem.branchDrawsLevel, reversedDirection, parentSystem);
+					this.processPortResult(branchResult,parentSystem)
+
+				}
+			})
+		}
+	},
 }
 
 export default Tracer

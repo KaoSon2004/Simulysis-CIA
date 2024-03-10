@@ -79,15 +79,15 @@ var ImpactComputer = {
 			branchDraws = LineUtil.getAllBranch(this.lineDraws, []);
 		}
 
-		this.utils.setBlockDepthCount(inputSystem, 0)
+		inputSystem.depthLevel = 0
+		inputSystem.rootObj = null
+		inputSystem.lineInSubsys = null
 
 		if ((SystemUtil.isRefToFile(inputSystem.blockType, inputSystem.sourceFile) || inputSystem.blockType == 'SubSystem') && inputSystem.sourceFile != "") {
 			this.utils.foundBlocks.push(inputSystem);
 			this.utils.filterAndInitDraws(this.lineDraws, this.systemDraws, this.lineDraws
 				, branchDraws, inputSystem, reversedDirection, this.depthLevel, 0);
 		} else {
-			this.utils.foundBlocks.push(inputSystem)
-
 			inputSystem.initListObjDraws(this.systemDraws, this.lineDraws, branchDraws);
 			inputSystem.setCurrentDeepLevel(this.depthLevel);
 			inputSystem.setCurrentTraceLevel(0);
@@ -134,6 +134,7 @@ var ImpactComputer = {
 	async getNeighborSet(unit, digDepth) {
 		var neighborSet = []
 		neighborSet.push(...await this.doTrace(unit, digDepth, false));
+
 		let reversedNeighbor = await this.doTrace(unit, digDepth, true)
 
 		// Most likely impossible but it's safe to check

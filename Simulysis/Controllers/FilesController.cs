@@ -277,33 +277,5 @@ namespace Simulysis.Controllers
 
             return View(newfileView);
         }
-
-        [Route("Files/{projectId}/{fileId}/Trackline")]
-        [HttpGet]
-        public ActionResult Trackline(long projectId, long fileId)
-        {
-            Loggers.SVP.Info("Trackline from file");
-            ProjectDTO project = projectDAO.ReadProjectById(projectId);
-            ViewBag.ProjectName = project.Name;
-            ViewBag.ProjectId = project.Id;
-
-            ProjectFileDTO projectFile = projectFileDAO.ReadFileById(fileId);
-            ViewBag.FileName = projectFile.Name;
-            ViewBag.FileId = projectFile.Id;
-            ViewBag.WWWRoot = Configuration.WWWRoot;
-            ViewBag.SystemLevel = projectFile.SystemLevel;
-            ViewBag.RootSysId = Request.Query["rootSysId"].ToString();
-
-            return View();
-        }
-        [Route("Files/{projectId}/{fileId}/TracklineDetail")]
-        [HttpGet]
-        public ActionResult TracklineDetail (long projectId, long fileId)
-        {
-            
-
-            return View();
-        }
-
     }
 }

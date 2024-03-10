@@ -79,9 +79,6 @@ else
                             <a class="selected" id="newFromLocal">
                                 From Your Computer
                             </a>
-                            <a class="" id="newFromGit">
-                                From Git
-                            </a>
                         </div>
 
                         @*                        <a class="" id="newVersion" style="display: none">
@@ -172,7 +169,6 @@ else
                 return;
                 }*@
                     this.classList.add("selected")
-                $("#newFromGit").removeClass("selected");
         @*                $("#generalFormDiv").hide();
                 *@$("#uploadLocalInfo").show();
         @*                $("#uploadInfoGeneral").show();
@@ -182,40 +178,6 @@ else
         @*                $("#currentUploadSummaryDesc").html(buildShortUploadSummary());
                 *@            })
 
-            $("#newFromGit").click(function () {
-                var uploadView0 = document.getElementsByClassName("uploadView")[0];
-                var uploadView = document.getElementsByClassName("uploadView")[1];
-                uploadView.classList.add("stretch")
-                uploadView0.classList.add("stretch")
-                this.classList.add("selected")
-        @*                if (!$("#projectName").val()) {
-                $("#uploadingBlockedModal").modal("show");
-                return;
-                }*@
-                    $("#newFromLocal").removeClass("selected");
-        @*$("#basicUploadInfo").hide();*@
-                    $("#uploadLocalInfo").hide();
-                $("#uploadGitInfo").show();
-        @*                $("#uploadInfoGeneral").show();
-                *@               @*$("#uploadMethod").hide();*@
-
-        @*                $("#currentUploadSummaryDesc").html(buildShortUploadSummary());
-                *@
-                    $.ajax({
-                        url: '@Url.Content("~/Projects/NewFromGit?baseProjectId=")' + $("#OriginalProjectId").val(),
-                        cache: false,
-                        contentType: false,
-                        processData: false,
-                        method: 'GET',
-                        type: 'GET', // For jQuery < 1.9
-                        success: function (data) {
-                            $("#uploadGitInfo").empty().append(data)
-                        },
-                        error: function (data) {
-                            alert("Failed to render Git upload view!")
-                        }
-                    });
-            })
 
             $(".newProjectBtn").click(function () {
                 $(".main-container").addClass("formUploadView");

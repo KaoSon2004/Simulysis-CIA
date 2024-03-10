@@ -7,6 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\Scripts\site\draw\network\**" />
+    <Compile Remove="wwwroot\Scripts\site\pages\network-extend\**" />
+    <Compile Remove="wwwroot\Scripts\site\pages\trackline\**" />
+    <Content Remove="wwwroot\Scripts\site\draw\network\**" />
+    <Content Remove="wwwroot\Scripts\site\pages\network-extend\**" />
+    <Content Remove="wwwroot\Scripts\site\pages\trackline\**" />
+    <EmbeddedResource Remove="wwwroot\Scripts\site\draw\network\**" />
+    <EmbeddedResource Remove="wwwroot\Scripts\site\pages\network-extend\**" />
+    <EmbeddedResource Remove="wwwroot\Scripts\site\pages\trackline\**" />
+    <None Remove="wwwroot\Scripts\site\draw\network\**" />
+    <None Remove="wwwroot\Scripts\site\pages\network-extend\**" />
+    <None Remove="wwwroot\Scripts\site\pages\trackline\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="compilerconfig.json" />
     <Content Remove="wwwroot\css\Site\Components\compareTreePartial.cs" />
     <Content Remove="wwwroot\css\Site\Components\_button.scss" />
@@ -142,18 +157,11 @@
     <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\terminator.js" />
     <None Include="wwwroot\Scripts\site\draw\model\draw-entities\system\toWorkspace.js" />
     <None Include="wwwroot\Scripts\site\draw\model\index.js" />
-    <None Include="wwwroot\Scripts\site\draw\network\draw-entities\fileRect.js" />
-    <None Include="wwwroot\Scripts\site\draw\network\draw-entities\functionGroup.js" />
-    <None Include="wwwroot\Scripts\site\draw\network\index.js" />
     <None Include="wwwroot\Scripts\site\loader.js" />
     <None Include="wwwroot\Scripts\site\noop.js" />
-    <None Include="wwwroot\Scripts\site\pages\network-extend\index.js" />
-    <None Include="wwwroot\Scripts\site\pages\network-extend\signalTable.js" />
     <None Include="wwwroot\Scripts\site\pages\show-file\index.js" />
     <None Include="wwwroot\Scripts\site\pages\show-file\search.js" />
     <None Include="wwwroot\Scripts\site\pages\show-file\viewManager.js" />
-    <None Include="wwwroot\Scripts\site\pages\trackline\index.js" />
-    <None Include="wwwroot\Scripts\site\pages\trackline\tracklineViewManager.js" />
     <None Include="wwwroot\Scripts\site\pagination.js" />
     <None Include="wwwroot\Scripts\site\readme.md" />
     <None Include="wwwroot\Scripts\site\treeview.js" />

@@ -114,6 +114,8 @@ var TracerState = {
 
 		entity.initListObjDraws(systemDraws, lineDraws, branchDraws);
 		entity.setParentSystem(prevEntity.getParentSystem());
+		
+		entity.initResponse(prevEntity.getResponse());
 		entity.setCurrentDeepLevel(prevEntity.getCurrentDeepLevel());
 		entity.setTraceDeepLevel(prevEntity.getTraceDeepLevel());
 		entity.setFileContent(prevEntity.getFileContent());
@@ -125,19 +127,43 @@ var TracerState = {
 			return line[type]?.stringId == system.stringId
 		})
 	},
-	findLineByPort(lines, type, portType, port, system,) {
+	findLineByPort(s, lines, reversedDirection, parentSystem) {
+		const port = Number(s.props.Port ?? 1);
+		parentSystem.addOutport(s)
+		var type = reversedDirection ? 'dst' : 'src'
+		var portType = type + 'Port'
+
 		return lines.find(line => {
-			return line[portType] == port && system.stringId == line[type].stringId
+			return line[portType] == port && parentSystem.stringId == line[type].stringId
+		})
+	},
+	findLineByPortNumber(port, lines, reversedDirection, parentSystem) {
+		var type = reversedDirection ? 'dst' : 'src'
+		var portType = type + 'Port'
+
+		return lines.find(line => {
+			return line[portType] == port && parentSystem.stringId == line[type].stringId
 		})
 	},
 	findBranchByStringId(branches, type, system) {
+		if (!branches) {
+			return [];
+		}
+
 		return branches.filter(branch => {
 			return branch[type]?.stringId == system.stringId
 		})
 	},
-	findBranchByPort(branches, type, portType, port, system,) {
+	findBranchByPort(s, branches, reversedDirection, parentSystem) {
+		if (!branches) {
+			return null
+		}
+		const port = Number(s.props.Port ?? 1);
+		parentSystem.addOutport(s)
+		var type = reversedDirection ? 'dst' : 'src'
+		var portType = type + 'Port'
 		return branches.find(branch => {
-			return branch[portType] == port && system.stringId == branch[type].stringId
+			return branch[portType] == port && parentSystem.stringId == branch[type].stringId
 		})
 	},
 	findSystemByPort(systems, obj, reversedDirection) {
@@ -157,69 +183,66 @@ var TracerState = {
 		let sys = systems.find(system => {
 			return system?.stringId == lineResult[type]?.stringId
 		});
-
+		
 		if (!sys) {
-			return null
+			return null;
 		}
-
+		
 		sys = this.spreadInfor(
 			sys, systems, lines, branches, lineResult
 		);
-		var newSys = Object.create(sys);
-		newSys.setCurrentTraceLevel(lineResult.getCurrentTraceLevel());
+		var newSys = sys;
+		newSys.rootObj = lineResult;
+		newSys.addToRootObjArr(lineResult);
 		return newSys;
+
 	},
 	findLineResult(system, systems, lines, branches, reversedDirection = false) {
 
 		var type = reversedDirection ? 'dst' : 'src'
 
 		var lineResults = [];
+
 		var newLineResults = [];
-		var num = 0;
-		const { cx: rootCx, cy: rootCy } = system.treeCoordinate;
 		lineResults = this.findLineByStringId(lines, type, system);
-		if (lineResults.length > 1) {
-			num = lineResults.length;
-		}
+
 		lineResults.forEach(lineResult => {
 			lineResult = this.spreadInfor(
 				lineResult, systems, lines, branches, system
 			)
-			var newLineResult = Object.create(lineResult);
 
-			newLineResult?.setCurrentTraceLevel(system.getCurrentTraceLevel() + num);
+			var newLineResult = lineResult;
+
 			newLineResult.rootObj = system;
+			newLineResult.addToRootObjArr(system);
 
-			newLineResult.rootCoor = { cx: rootCx, cy: rootCy }
-
-			num--
 			newLineResults.push(newLineResult);
 		})
 		var result = [...newLineResults]
 
 		return [...new Set(result)]
+
+
 	},
-	findBranchResult(system, systems, lines, branches, reversedDirection = false, plusTraceLevel) {
+	findBranchResult(system, systems, lines, branches, reversedDirection = false) {
 		var type = reversedDirection ? 'dst' : 'src';
 		var branchResults = [];
 		var newBranchResults = [];
-		const { cx: rootCx, cy: rootCy } = system.treeCoordinate;
-
 		branchResults = this.findBranchByStringId(branches, type, system);
 		branchResults.forEach(branchResult => {
 
 			branchResult = this.spreadInfor(
 				branchResult, systems, lines, branches, system
-
 			);
-			var newBranchResult = Object.create(branchResult);
-			newBranchResult.setCurrentTraceLevel(system.getCurrentTraceLevel() + plusTraceLevel);
-			plusTraceLevel++;
+
+			var newBranchResult = branchResult;
+
 			newBranchResult.rootObj = system;
-			newBranchResult.rootCoor = { cx: rootCx, cy: rootCy };
+			newBranchResult.addToRootObjArr(system);
 			newBranchResults.push(newBranchResult);
 		})
 		return newBranchResults
+
 	},
 	filterAndInitDraws(draws, systemDraws, lineDraws, branchDraws
 		, block, reversedDirection, depthLevel, currentTraceLevel) {
@@ -237,6 +260,9 @@ var TracerState = {
 			if (filterResult) {
 				filterResult.originSystem = block;
 			}
+
+			filterResult.depthLevel = 0
+			filterResult.rootObj = null
 
 			this.addStack(filterResult);
 
@@ -318,7 +344,7 @@ var TracerState = {
 						branchresult = this.spreadInfor(
 							branchresult, systems, lines, branches, branchObj
 						)
-						newBranchResult = Object.create(branchresult);
+						newBranchResult = branchresult;
 						newBranchResult.setCurrentTraceLevel(branchObj.getCurrentTraceLevel());
 						newBranchResult.rootObj = branchObj;
 						newBranchResult.rootCoor = { cx: rootCx, cy: rootCy }
@@ -344,7 +370,7 @@ var TracerState = {
 						lineResult = this.spreadInfor(
 							lineResult, systems, lines, branches, branchObj
 						);
-						newLineResult = Object.create(lineResult);
+						newLineResult = lineResult;
 						newLineResult.setCurrentTraceLevel(branchObj.getCurrentTraceLevel());
 						newLineResult.rootObj = branchObj;
 						newLineResult.rootCoor = { cx: rootCx, cy: rootCy }

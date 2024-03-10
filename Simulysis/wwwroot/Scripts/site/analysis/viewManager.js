@@ -1,8 +1,6 @@
 ﻿import FilesAPI from '../api/files.js'
 import FileContentsAPI from '../api/fileContents.js'
 import FileRelationshipsAPI from '../api/fileRelationships.js'
-import LogAPI from '../api/log.js'
-import NetworkDraw from '../draw/network/index.js'
 import TreeDraw from '../draw/tree/index.js'
 import TreeFolderDraw from '../draw/folderTree/index.js'
 import AnalysisModelDraw from './analysisModelDraw.js'
@@ -69,42 +67,24 @@ var ViewManager = {
         const rootSysId = Number($('#rootSysId').val() ?? 0)
         await this.updateContent()
         this.createModelDraw(rootSysId)
+        
+        if (rootSysId > 0) {
+            let subsys = this.allLevelContents[`level${this.currentLevel}`].fileContent.systems.find(
+                system => system.id == rootSysId
+            )
 
-        if (this.hasNetworkView) {
-            if (rootSysId > 0) {
-                let subsys = this.allLevelContents[`level${this.currentLevel}`].fileContent.systems.find(
-                    system => system.id == rootSysId
-                )
+            this.currentSubsysFileId = subsys.fK_FakeProjectFileId
+            let explicitRela = (await this.getSubsysRelationships(this.currentSubsysFileId)).response
 
-                this.currentSubsysFileId = subsys.fK_FakeProjectFileId
-                let explicitRela = (await this.getSubsysRelationships(this.currentSubsysFileId)).response
-
-                if (this.showTree) {
-                    //this.createTreeDraw({ explicitRela })
-                    //this.createTreeFolderDraw({ explicitRela })
-                } else {
-                    this.createNetworkDraw({ explicitRela })
-                    this.createTreeFolderDraw({ explicitRela })
-                }
-            } else {
-                if (this.showTree) {
-                    this.createTreeDraw()
-                    this.createTreeFolderDraw()
-                } else {
-                    this.createNetworkDraw()
-                    this.createTreeFolderDraw()
-                }
-            }
-
-            this.updateToggleDrawButtonText()
+            this.createTreeFolderDraw({ explicitRela })
+        } else {
+            this.createTreeDraw()
+            this.createTreeFolderDraw()
         }
+
+        this.updateToggleDrawButtonText()
 
         this.disallowUserSelect()
-        if (this.hasNetworkView) {
-            this.addEventHandlers();
-            this.adjustViewToMatchSwap()
-            this.allowSearch()
-        }
         this.addAllowSelectEvent()
         this.initChangeHandler()
         // stop loading
@@ -132,7 +112,6 @@ var ViewManager = {
     createSelect() {
         var myParent = document.getElementById("impactedDigDepth");
 
-        // Create select only in file
         if (!myParent) {
             return;
         }
@@ -235,7 +214,7 @@ var ViewManager = {
         
 
     },
-    initOptions({ hasNetworkView = true, modelViewPopUp = true, goUpDownCallback = noop, }) {
+    initOptions({ modelViewPopUp = true, goUpDownCallback = noop, }) {
         this.initialLevel = SystemLevelUtil.mapNameToLevel($('#systemLevelText').text())
         this.currentLevel = this.initialLevel
         this.originalFileId = Number($('#fileId').val())
@@ -247,71 +226,9 @@ var ViewManager = {
         this.showTree = $('#displayTreeView').val() == 'true'
 
         this.isAnalysisApplied = false;
-        this.hasNetworkView = hasNetworkView
+        this.hasNetworkView = false
         this.modelViewPopUp = modelViewPopUp
         this.goUpDownCallback = goUpDownCallback
-    },
-    createNetworkDraw({ explicitRela, funcGrObj = {} } = {}) {
-        // close the dropdown if currently opened
-        this.networkDraw?.destroyDisplayOptDropdown()
-
-        // get states for next draw
-        var displayOptions = this.networkDraw?.getDisplayOptions()
-        const openPopUp = this.networkDraw?.destroy() ?? false
-        // const isFunctionLevelOrLower = this.currentLevel >= 2
-
-        var { relationshipsObj } = this.allLevelContents[`level${this.currentLevel}`]
-        if (explicitRela) {
-            relationshipsObj = explicitRela
-        }
-
-        this.networkDraw = Object.create(NetworkDraw).init(
-            {
-                viewId: this.subViewId,
-                drawId: this.networkDrawId,
-                whId: this.subViewId
-            },
-            relationshipsObj,
-            `${this.viewType}Relationships`,
-            this.files,
-            explicitRela ? this.currentSubsysFileId : this.currentFileId,
-            {
-                fileRectClickHandlerGenerator: this.navigateToNewFileGenerator.bind(this),
-                subSysClickHandlerGenerator: this.getSystemClickHandler.bind(this),
-                parentSysClickHandler: this.goUpLevel,
-                lineClickHandler: this.triggerSignalSearch.bind(this),
-                onToggleFileLines: this.updateFullNetBtnText.bind(this),
-                onDisplayChange: this.adjustViewToMatchFullNet.bind(this)
-            },
-            {
-                ...displayOptions,
-                // sub systems props
-                // showSubSystemAsChild: isFunctionLevelOrLower,
-
-                // popup props
-                openPopUp,
-                allowPopUp: true,
-                popUpProps: {
-                    w: 1000,
-                    h: 800,
-                    url:
-                        window.location.href
-                            .split('?')[0]
-                            .replace(new RegExp(`\\b${this.originalFileId}\\b`), this.currentFileId)
-                            .replace(new RegExp('\\bShow\\b'), 'NetworkExtend') +
-                        // `?viewType=${this.viewType}&showSubSystemAsChild=${isFunctionLevelOrLower}&rootSysId=${this.rootSysId}` +
-                        `?viewType=${this.viewType}&subSysFileId=${this.currentSubsysFileId}`
-                },
-
-                // function group props
-                ...funcGrObj
-            }
-        )
-        this.networkDraw.draw()
-
-        this.adjustViewToMatchFullNet()
-
-        LogAPI.log(this.networkDraw.globalDrawConst)
     },
     createTreeDraw({ explicitRela } = {}) {
         this.treeDraw?.destroy()
@@ -336,9 +253,6 @@ var ViewManager = {
                 fileRectClickHandlerGenerator: this.navigateToNewFileGenerator.bind(this),
                 subSysClickHandlerGenerator: this.getSystemClickHandler.bind(this),
                 parentSysClickHandler: this.goUpLevel,
-                lineClickHandler: this.triggerSignalSearch.bind(this),
-                onToggleFileLines: this.updateFullNetBtnText.bind(this),
-                onDisplayChange: this.adjustViewToMatchFullNet.bind(this)
             },
             {
                 allowPopUp: false
@@ -367,9 +281,6 @@ var ViewManager = {
                 fileRectClickHandlerGenerator: this.navigateToNewFileGenerator.bind(this),
                 subSysClickHandlerGenerator: this.getSystemClickHandler.bind(this),
                 parentSysClickHandler: this.goUpLevel,
-                lineClickHandler: this.triggerSignalSearch.bind(this),
-                onToggleFileLines: this.updateFullNetBtnText.bind(this),
-                onDisplayChange: this.adjustViewToMatchFullNet.bind(this)
             },
             {
                 allowPopUp: false
@@ -438,11 +349,7 @@ var ViewManager = {
 
         this.modelDraw.initRemovedSystems(removedSystemsFiltered)
         this.modelDraw.draw()
-
-        if (this.hasNetworkView) {
-            this.modelDraw.initDragDropEvent();
-        }
-
+        
         // Hide all removed by default
         this.modelDraw.drawEntities.removedSystems.forEach((system) => {
             $(`#${system.stringId}`).parent().addClass('removed-change-invisible')
@@ -510,9 +417,6 @@ var ViewManager = {
     addEventHandlers() {
         const self = this;
 
-        $('#switchViewBtn').click(this.swapView.bind(this))
-        $('#viewNetworkBtn').click(this.toggleNetwork.bind(this))
-        $('#viewType').change(this.changeNetworkViewType.bind(this))
         $('#popUpTrackline').click(this.popUpTrackline.bind(this))
         $('#toggleTreeBtn').click(this.toggleSideView.bind(this))
         $('#analyseBtn').click(this.analyse.bind(this))
@@ -951,7 +855,6 @@ var ViewManager = {
         this.highlightBlock(block, nameElement.html(), "red", toTurnOn, true);
     },
     impactedBlockHighlightSingle(element) {
-        console.log("ha")
         let visbilityElement = $('#visibility', element)
         let visbilityValueElement = $('#visibilityValue', element)
         let nameElement = $('#name', element)
@@ -1003,18 +906,6 @@ var ViewManager = {
             this.swapped = !this.swapped
         }
     },
-    toggleNetwork() {
-        const allShown = this.networkDraw.isAllSubLinesShown()
-        const allHidden = this.networkDraw.isAllSubLinesHiden()
-
-        if (allShown && allHidden) {
-            this.updateFullNetBtnText(!this.fullNet)
-        } else if (allShown) {
-            this.networkDraw.hideAllSubLines()
-        } else {
-            this.networkDraw.showAllSubLines()
-        }
-    },
     updateToggleDrawButtonText() {
         if (this.showTree) {
             $('#toggleTreeBtn span').text('Hide tree')
@@ -1022,87 +913,14 @@ var ViewManager = {
             $('#toggleTreeBtn span').text('Show tree')
         }
     },
-    async toggleSideView() {
-        var previousSideView = this.tempSideView
-
-        if (this.showTree) {
-            this.tempSideView = this.treeDraw.detach()
-            if (previousSideView) {
-                $(`#${this.subViewId}`).append(previousSideView)
-            } else {
-                var funcGrObj = this.networkDraw ? this.networkDraw.getCurrentFunctionGroups() : null
-
-                if (this.rootSysId > 0) {
-                    let subsys = this.allLevelContents[`level${this.currentLevel}`].fileContent.systems.find(
-                        system => system.id == this.rootSysId
-                    )
-
-                    this.currentSubsysFileId = subsys.fK_FakeProjectFileId
-                    let explicitRela = (await this.getSubsysRelationships(this.currentSubsysFileId)).response
-
-                    this.createNetworkDraw({ explicitRela, funcGrObj })
-                } else {
-                    this.createNetworkDraw({ funcGrObj })
-                }
-            }
-        } else {
-            this.tempSideView = this.networkDraw.detach()
-            if (previousSideView) {
-                $(`#${this.subViewId}`).append(previousSideView)
-            } else {
-                if (this.rootSysId > 0) {
-                    let subsys = this.allLevelContents[`level${this.currentLevel}`].fileContent.systems.find(
-                        system => system.id == this.rootSysId
-                    )
-
-                    this.currentSubsysFileId = subsys.fK_FakeProjectFileId
-                    let explicitRela = (await this.getSubsysRelationships(this.currentSubsysFileId)).response
-
-                    this.createTreeDraw({ explicitRela })
-                } else {
-                    this.createTreeDraw()
-                }
-            }
-        }
-
-        this.showTree = !this.showTree;
-        this.updateToggleDrawButtonText();
-    },
-    async changeNetworkViewType(e) {
-        this.viewType = e.target.value
-
-        var funcGrObj = this.networkDraw.getCurrentFunctionGroups()
-
-        // TODO: MAKE A FUNCTION TO REUSE THIS CODE
-        // DUPLICATE WITH CODE IN INIT() FUNCTION
-        if (rootSysId > 0) {
-            let subsys = this.allLevelContents[`level${this.currentLevel}`].fileContent.systems.find(
-                system => system.id == rootSysId
-            )
-
-            this.currentSubsysFileId = subsys.fK_FakeProjectFileId
-            let explicitRela = (await this.getSubsysRelationships(this.currentSubsysFileId)).response
-
-            this.createNetworkDraw({ explicitRela, funcGrObj })
-        } else {
-            this.createNetworkDraw({ funcGrObj })
-        }
-    },
     detachDraws() {
         var modelDraw = this.modelDraw.detach()
-        var sideDraw = this.showTree ? this.treeDraw.detach() : this.networkDraw.detach()
+        var sideDraw = this.treeDraw.detach()
         return { modelDraw, sideDraw }
     },
     attachDraws(modelDraw, sideDraw) {
         $(`#${this.mainViewId}`).append(modelDraw)
         $(`#${this.subViewId}`).append(sideDraw)
-    },
-    adjustViewToMatchFullNet() {
-        if (this.fullNet) {
-            this.networkDraw.showAllSubLines()
-        }
-
-        this.updateFullNetBtnText()
     },
     adjustViewToMatchSwap() {
         if (this.swapped) {
@@ -1140,11 +958,7 @@ var ViewManager = {
 
             initialRootSysId && (newUrl = `${newUrl}&rootSysId=${initialRootSysId}`)
 
-            if (!this.showTree) {
-                window.location.href = this.networkDraw.appendDisplayOptionsToUrl(newUrl)
-            } else {
-                window.location.href = newUrl
-            }
+            window.location.href = newUrl
         }
     },
     triggerSignalSearch(fileIds) {
@@ -1176,40 +990,6 @@ var ViewManager = {
     stopLoadingViews() {
         $('.main-loader').css('display', 'none')
         $('.main-container').css('filter', 'none')
-    },
-    updateFullNetBtnText(fullNet) {
-        if (typeof fullNet != 'undefined') {
-            this.fullNet = fullNet
-
-            if (this.fullNet) {
-                $('#viewNetworkBtn span').text('Hide network')
-            } else {
-                $('#viewNetworkBtn span').text('View full network')
-            }
-        }
-
-        const allShown = true
-        const allHidden = false
-
-        // when there is no sub-lines
-        if (allShown && allHidden) {
-            if ($('#viewNetworkBtn span').text() == 'View remain') {
-                $('#viewNetworkBtn span').text('View full network')
-            }
-
-            return
-        }
-
-        if (allShown) {
-            $('#viewNetworkBtn span').text('Hide network')
-            this.fullNet = true
-        } else if (allHidden) {
-            this.fullNet = false
-            $('#viewNetworkBtn span').text('View full network')
-        } else {
-            this.fullNet = false
-            $('#viewNetworkBtn span').text('View remain')
-        }
     },
     getSystemClickHandler(
         { blockType, sourceFile, sourceBlock },
@@ -1362,9 +1142,6 @@ var ViewManager = {
 
                     // get the function groups from network view and save it
                     // then later we can use it when we go up level
-                    if (this.hasNetworkView && !this.showTree) {
-                        this.saveLevelFuncGr(this.networkDraw.getCurrentFunctionGroups())
-                    }
                     this.updateLevel(this.currentLevel + 1)
 
                     await this.updateContent(sourceFile, blockType, sourceBlock, sysId, isFromSysRef)
@@ -1395,18 +1172,15 @@ var ViewManager = {
             this.currentSubsysFileId = relaFakeFileId
             this.createModelDraw(sysId, needDrawDotMakersObj);
 
-            if (this.hasNetworkView) {
-                if (stillInFile) {
-                    // } if (this.currentLevel >= 2) {
-                    let explicitRela = sysId > 0 ? (await this.getSubsysRelationships(relaFakeFileId)).response : null
-                    let funcGrObj = this.showTree ? null : this.networkDraw.getCurrentFunctionGroups()
-                    this.showTree ? this.createTreeDraw({ explicitRela }) : this.createNetworkDraw({ explicitRela, funcGrObj })
-                } else if (direction == 'up') {
-                    let { funcGrObj } = this.allLevelContents[`level${this.currentLevel}`]
-                    this.showTree ? this.createTreeDraw() : this.createNetworkDraw({ funcGrObj })
-                } else {
-                    this.showTree ? this.createTreeDraw() : this.createNetworkDraw()
-                }
+            if (stillInFile) {
+                // } if (this.currentLevel >= 2) {
+                let explicitRela = sysId > 0 ? (await this.getSubsysRelationships(relaFakeFileId)).response : null
+                this.createTreeDraw({ explicitRela })
+            } else if (direction == 'up') {
+                let { funcGrObj } = this.allLevelContents[`level${this.currentLevel}`]
+                this.createTreeDraw()
+            } else {
+                this.createTreeDraw()
             }
 
             this.goUpDownCallback()
@@ -1548,6 +1322,7 @@ var ViewManager = {
     },
     
     async findImpactsInCurrentFile(depth) {
+        console.log('Find impact in current file with depth ' + depth)
         /*
         let fileContent = this.allLevelContents[`level${this.currentLevel}`]?.fileContent
         
@@ -1630,8 +1405,6 @@ var ViewManager = {
 
     setChangesVisiblityImpl(cls, color, showAll, isHighlightingRemoved) {
         $(`.${cls}`).each((i, element) => {
-            console.log("ha")
-            console.log(element)
             let visbilityElement = $('#visibility', element)
             let visbilityValueElement = $('#visibilityValue', element)
             let nameElement = $('#name', element)

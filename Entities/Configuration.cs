@@ -48,10 +48,6 @@ namespace Entities
                 return connString;
             }
         }
-        public static string PAT
-        {
-            get => configuration.GetValue<string>("pat");
-        }
         public static int SQLCommandTimeOut
         {
             get => configuration.GetValue("SQLCommandTimeOut", 600);

@@ -26,7 +26,8 @@ UET. SQA320 - The project to create a tool for analyze the projects / models cre
   
   - Add your database <br />
   
-    ```  "ConnectionStrings": {
+    ```
+    "ConnectionStrings": {
       "Default": "Server=;Database=;Uid=;Pwd=;Connect Timeout=600"
     }
     ```

@@ -12,7 +12,7 @@ UET. SQA320 - The project to create a tool for analyze the projects / models cre
 - Import Official_DB to your MySql Workbench 8.0
 - Open Visual Studio 2022
 - Set Simulysis as Startup project
-- Edit appsettings.json file
+- Edit Simulysis/appsettings.json file
   - Add your database <br />
     `  "ConnectionStrings": {
       "Default": "Server=;Database=;Uid=;Pwd=;Connect Timeout=600"

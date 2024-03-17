@@ -9,7 +9,7 @@ UET. SQA320 - The project to create a tool for analyze the projects / models cre
 ## How To Run
 - Clone the repo <br />
   `git clone https://github.com/KaoSon2004/Simulysis-CIA.git`
-- Import Official_DB to your MySql Workbench 8.0
+- Import Official_DB.sql to your MySql Workbench 8.0
 - Open Visual Studio 2022
 - Set Simulysis as Startup project
 - Edit Simulysis/appsettings.json file

@@ -1,5 +1,5 @@
-# About This Project
-UET. SQA320 - The project to create a tool for analyze the projects / models created in Simulink
+# About Simulysis
+Simulysis a method and a tool that is based on the WAVE-CIA method for change impact analysis of Simulink projects. For an uploaded project, Simulysis extracts the information to build the corresponding call graph. Then, it calculates the change set from the two call graphs corresponding to two versions of the Simulink project. Finally, it computes the impact set of the project with the given change set. The tool provides an effective and efficient way to address the change impact analysis of Simulink projects.
 
 # Installation
 ## Prerequirements
